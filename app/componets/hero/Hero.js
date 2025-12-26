@@ -36,8 +36,8 @@ export default function Hero({ productsData, usersData, reviewsData }) {
   // Static hero content
   const heroData = {
     title: "Discover",
-    subtitle: "Professional", 
-    mainTitle: "Cameras",
+    subtitle: "Vintage Cameras", 
+    mainTitle: "",
     description: "Capture moments the way they were meant to be remembered. A curated collection of vintage cameras. Where craftsmanship, character, and history live in every frame.",
     productName: "Professional Cameras",
     productPrice: "৳8,500",
