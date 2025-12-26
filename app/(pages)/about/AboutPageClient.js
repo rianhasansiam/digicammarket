@@ -191,7 +191,7 @@ const AboutPageClient = ({ aboutData }) => {
     );
   };
 
-  // Values Section Component
+
   const ValuesSection = () => {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true });
