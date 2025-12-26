@@ -23,7 +23,7 @@ const Counter = ({ from = 0, to, duration = 2, suffix = "" }) => {
 
 const HeroClient = ({ 
   title = "Discover",
-  subtitle = "Professional", 
+  subtitle = "Vintage", 
   mainTitle = "Cameras",
   description = "Capture every moment with our collection of professional cameras. Quality, performance, and innovation in every shot.",
   stats = [

@@ -808,14 +808,14 @@ const CheckoutPageClient = () => {
                           <Phone className="w-5 h-5 text-pink-600" />
                           <div>
                             <p className="font-medium text-gray-900">bKash</p>
-                            <p className="text-sm text-gray-600">Personal: 01XXXXXXXXX</p>
+                            <p className="text-sm text-gray-600">Personal: 01870404001</p>
                           </div>
                         </div>
                         <div className="flex items-center space-x-3 p-3 bg-orange-50 rounded-lg">
                           <Phone className="w-5 h-5 text-orange-600" />
                           <div>
                             <p className="font-medium text-gray-900">Nagad</p>
-                            <p className="text-sm text-gray-600">Personal: 01XXXXXXXXX</p>
+                            <p className="text-sm text-gray-600">Personal: 01322334625</p>
                           </div>
                         </div>
                       </div>
