@@ -189,7 +189,7 @@ export default function AboutPage() {
     },
 
     cta: {
-      title: "Ready er bodole : Step Into the Art of Photography",
+      title: "Step Into the Art of Photography",
       subtitle: "Chosen by photographers who believe in well-kept tools and thoughtful guidance.",
       description: "Discover carefully selected cameras, lenses, and accessories, offered with knowledge you can rely on.",
       buttonText: "Shop Cameras",

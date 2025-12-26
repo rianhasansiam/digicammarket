@@ -28,7 +28,7 @@ const HeroClient = ({
   description = "Capture every moment with our collection of professional cameras. Quality, performance, and innovation in every shot.",
   stats = [
     { number: "500+", label: "Premium Cameras" },
-    { number: "50K+", label: "Happy Photographers" },
+    { number: "500+", label: "Happy Photographers" },
     { number: "99%", label: "Satisfaction Rate" }
   ],
   productName = "Professional Camera",
