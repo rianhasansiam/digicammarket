@@ -1,6 +1,6 @@
 'use client';
 
-import { useGetData } from '@/lib/hooks/useGetData';
+import { useProducts, useCategories, useReviews, useUsers } from '@/lib/hooks/useReduxData';
 import GlobalLoadingPage from './componets/loading/GlobalLoadingPage';
 import Hero from './componets/hero/Hero';
 import Category from './componets/category/Category';
@@ -9,37 +9,18 @@ import Review from './componets/review/Review';
 import StructuredData, { MultipleStructuredData } from './componets/shared/StructuredData';
 
 export default function HomePageClient() {
-  // 🚀 OPTIMIZED: Use standardized query keys for data deduplication
-  const { data: productsData, isLoading: productsLoading, error: productsError } = useGetData({
-    name: 'products', // Standardized query key
-    api: '/api/products',
-    cacheType: 'STATIC'
-  });
-
-  const { data: categoriesData, isLoading: categoriesLoading, error: categoriesError } = useGetData({
-    name: 'categories', // Standardized query key  
-    api: '/api/categories',
-    cacheType: 'STATIC'
-  });
-
-  const { data: reviewsData, isLoading: reviewsLoading, error: reviewsError } = useGetData({
-    name: 'reviews', // Standardized query key
-    api: '/api/reviews?approved=true', // 🚀 OPTIMIZED: Only fetch approved reviews
-    cacheType: 'DYNAMIC'
-  });
-
-  const { data: usersData, isLoading: usersLoading, error: usersError } = useGetData({
-    name: 'users', // Standardized query key
-    api: '/api/users',
-    cacheType: 'DYNAMIC'
-  });
+  // 🚀 OPTIMIZED: Use Redux store for centralized data caching - NO duplicate API calls
+  const { data: productsData, isLoading: productsLoading, error: productsError } = useProducts();
+  const { data: categoriesData, isLoading: categoriesLoading, error: categoriesError } = useCategories();
+  const { data: reviewsData, isLoading: reviewsLoading, error: reviewsError } = useReviews();
+  const { data: usersData, isLoading: usersLoading, error: usersError } = useUsers();
 
   // Show loading state at page level while critical data is loading
   const isLoading = productsLoading || categoriesLoading || reviewsLoading || usersLoading;
   const hasError = productsError || categoriesError || reviewsError || usersError;
 
   // Keep showing loading until ALL data is ready (not just checking if data exists)
-  if (isLoading) {
+  if (isLoading && !productsData?.length && !categoriesData?.length) {
     return (
       <GlobalLoadingPage 
         message="Bringing Classics to Life..." 
@@ -64,6 +45,9 @@ export default function HomePageClient() {
       </div>
     );
   }
+
+  // Filter approved reviews from cached data
+  const approvedReviews = reviewsData?.filter(r => r.approved === true || r.isApproved === true) || [];
 
   // All data loaded - render all components together with opacity animation
   return (
@@ -103,11 +87,11 @@ export default function HomePageClient() {
         <Hero 
           productsData={productsData} 
           usersData={usersData} 
-          reviewsData={reviewsData} 
+          reviewsData={approvedReviews} 
         />
         <Category categoriesData={categoriesData} />
         <FeaturedProducts productsData={productsData} />
-        <Review reviewsData={reviewsData} />
+        <Review reviewsData={approvedReviews} />
       </div>
     </>
   );

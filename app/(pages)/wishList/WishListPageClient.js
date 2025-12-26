@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useGetData } from '@/lib/hooks/useGetData';
+import { useProducts } from '@/lib/hooks/useReduxData';
 import { useAppSelector, useAppDispatch } from '@/app/redux/reduxHooks';
 import { loadWishlistFromStorage, removeFromWishlist, addToCart } from '@/app/redux/slice';
 import { PLACEHOLDER_IMAGES } from '@/lib/constants';
@@ -202,12 +202,8 @@ const WishlistProductCard = ({ product, onRemove, onAddToCart, isSelected, onSel
 };
 
 export default function WishListPageClient() {
-  // 🚀 OPTIMIZED: Use standardized query keys for data deduplication
-  const { data: products, isLoading: productsLoading, error: productsError } = useGetData({
-    name: 'products', // Standardized query key
-    api: '/api/products',
-    cacheType: 'STATIC'
-  });
+  // 🚀 OPTIMIZED: Use Redux store for centralized data caching - NO duplicate API calls
+  const { data: products, isLoading: productsLoading, error: productsError } = useProducts();
 
   // Redux hooks
   const dispatch = useAppDispatch();

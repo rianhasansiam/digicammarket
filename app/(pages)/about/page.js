@@ -29,8 +29,8 @@ export default function AboutPage() {
   const aboutData = {
     hero: {
       title: "About Digicam Market",
-      subtitle: "Professional Photography Equipment Since 2025",
-      description: "We empower photographers to capture their vision with premium cameras and expert guidance.",
+      subtitle: "Carefully Curated Photography Equipment Since 2025",
+      description: "We specialize in pre-owned digital cameras. Thoughtfully collected, carefully checked, and offered with expert guidance. Our aim is to empower photographers to realize their vision using trusted equipment they can be proud to own.",
       backgroundImage: "https://images.unsplash.com/photo-1606240724602-5b21f896eae8?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
     },
     
@@ -125,7 +125,7 @@ export default function AboutPage() {
       subtitle: "Milestones that Define Our Success",
       achievements: [
         {
-          number: "15K+",
+          number: "500+",
           label: "Happy Photographers",
           description: "Satisfied customers nationwide"
         },
@@ -135,12 +135,12 @@ export default function AboutPage() {
           description: "Cameras, lenses & accessories"
         },
         {
-          number: "7+",
+          number: "2+",
           label: "Years Experience",
           description: "In camera retail industry"
         },
         {
-          number: "50+",
+          number: "10+",
           label: "Top Brands",
           description: "Canon, Nikon, Sony & more"
         },
@@ -189,9 +189,9 @@ export default function AboutPage() {
     },
 
     cta: {
-      title: "Ready to Start Your Photography Journey?",
-      subtitle: "Join thousands of satisfied photographers who trust us for their camera needs",
-      description: "Browse our collection of professional cameras, lenses, and accessories. Get expert advice and competitive prices on all your photography equipment.",
+      title: "Ready er bodole : Step Into the Art of Photography",
+      subtitle: "Chosen by photographers who believe in well-kept tools and thoughtful guidance.",
+      description: "Discover carefully selected cameras, lenses, and accessories, offered with knowledge you can rely on.",
       buttonText: "Shop Cameras",
       buttonLink: "/allProducts",
       secondaryButtonText: "Contact Us",

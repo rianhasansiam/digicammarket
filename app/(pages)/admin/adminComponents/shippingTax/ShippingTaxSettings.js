@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Truck, Receipt, DollarSign, Save, AlertCircle, CheckCircle } from 'lucide-react';
-import { useGetData } from '@/lib/hooks/useGetData';
+import { useShippingTax } from '@/lib/hooks/useReduxData';
 import axios from 'axios';
 
 const ShippingTaxSettings = () => {
@@ -22,12 +22,8 @@ const ShippingTaxSettings = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  // 🚀 OPTIMIZED: Use standardized query keys and appropriate cache type
-  const { data: currentSettings, isLoading: fetchLoading, refetch } = useGetData({
-    name: "shipping-tax-settings", // Standardized query key
-    api: "/api/shipping-tax-settings",
-    cacheType: 'USER_SPECIFIC' // Changed to USER_SPECIFIC since these are admin settings
-  });
+  // 🚀 OPTIMIZED: Use Redux store for centralized data caching - NO duplicate API calls
+  const { data: currentSettings, isLoading: fetchLoading, refetch } = useShippingTax();
 
   // Load settings when fetched
   useEffect(() => {

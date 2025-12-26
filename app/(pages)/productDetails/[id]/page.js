@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useGetData } from '@/lib/hooks/useGetData';
+import { useProducts, useProductReviews } from '@/lib/hooks/useReduxData';
 import { useAppDispatch } from '@/app/redux/reduxHooks';
 import { addToCart, removeFromCart, addToWishlist, removeFromWishlist } from '@/app/redux/slice';
 import { PLACEHOLDER_IMAGES } from '@/lib/constants';
@@ -94,23 +94,14 @@ export default function ProductDetailPage({ params }) {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const scrollContainerRef = useRef(null);
   
-  // Fetch all products using real API
-  const { data: products, isLoading, error } = useGetData({
-    name: 'products',
-    api: '/api/products'
-  });
+  // 🚀 OPTIMIZED: Use Redux store for centralized data caching - NO duplicate API calls
+  const { data: products, isLoading, error } = useProducts();
 
-  // Fetch reviews for this product
-  const { data: allReviews, isLoading: reviewsLoading, refetch: refetchReviews } = useGetData({
-    name: 'reviews',
-    api: `/api/reviews?productId=${productId}`
-  });
+  // Fetch reviews for this product from Redux cache
+  const { data: productReviews = [], isLoading: reviewsLoading, refetch: refetchReviews } = useProductReviews(productId);
 
   // Find the specific product by ID from real database (handle both _id and id)
   const product = products?.find(p => p._id === productId || p.id === productId);
-  
-  // Filter reviews for this specific product - now done server-side via query param
-  const productReviews = allReviews || [];
 
   // Local Storage utility functions
   const getCartFromStorage = () => {

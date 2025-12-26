@@ -75,9 +75,9 @@ const ProductsContent = ({ productsData, categoriesData }) => {
         </div>
       )}
 
-      <div className="container mx-auto px-4 lg:px-6 py-6 max-w-7xl">
+      <div className="container mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6 max-w-7xl">
         {/* Search Bar */}
-        <div className="mb-8">
+        <div className="mb-4 sm:mb-6 md:mb-8">
           <SearchBar />
         </div>
 
@@ -95,7 +95,7 @@ const ProductsContent = ({ productsData, categoriesData }) => {
               {/* Header */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
-                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900">All Products</h1>
+                  <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">All Products</h1>
                   <button
                     onClick={() => setMobileFiltersOpen(true)}
                     className="xl:hidden flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
@@ -106,7 +106,7 @@ const ProductsContent = ({ productsData, categoriesData }) => {
                 </div>
                 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                  <span className="text-sm text-gray-600">
+                  <span className="text-xs sm:text-sm text-gray-600">
                     Showing {processedProducts.length > 0 ? startIndex + 1 : 0}-{Math.min(endIndex, processedProducts.length)} of {processedProducts.length} products
                   </span>
                   <div className="flex items-center gap-2">

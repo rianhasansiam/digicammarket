@@ -16,7 +16,7 @@ import {
   Image as ImageIcon,
   X
 } from 'lucide-react';
-import { useGetData } from '../../../../../lib/hooks/useGetData';
+import { useCategories } from '@/lib/hooks/useReduxData';
 import { useUpdateData } from '../../../../../lib/hooks/useUpdateData';
 import { useDeleteData } from '../../../../../lib/hooks/useDeleteData';
 import AddCategoryModal from './categoryComponents/AddCategoryModal';
@@ -35,21 +35,16 @@ const AllCategoryClient = () => {
   const [deletingCategoryId, setDeletingCategoryId] = useState(null);
   const [toast, setToast] = useState({ show: false, type: 'success', message: '' });
 
-  // 🚀 OPTIMIZED: Use standardized query keys for data deduplication
-  const { data, isLoading, error } = useGetData({
-    name: 'categories', // Standardized query key
-    api: '/api/categories',
-    cacheType: 'STATIC'
-  });
+  // 🚀 OPTIMIZED: Use Redux store for centralized data caching - NO duplicate API calls
+  const { data, isLoading, error } = useCategories();
 
-  // 🚀 OPTIMIZED: Use standardized query keys for data deduplication
   const { updateData, isLoading: isUpdating } = useUpdateData({
-    name: 'categories', // Standardized query key
+    name: 'categories',
     api: '/api/categories'
   });
 
   const { deleteData, isLoading: isDeleting } = useDeleteData({
-    name: 'categories', // Standardized query key
+    name: 'categories',
     api: '/api/categories'
   });
 

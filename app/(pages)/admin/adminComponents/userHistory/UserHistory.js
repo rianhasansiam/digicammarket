@@ -2,14 +2,14 @@
 
 import { useMemo } from 'react';
 import UserHistoryClient from './UserHistoryClient';
-import { useGetData } from '../../../../../lib/hooks/useGetData';
+import { useUsers, useOrders, useProducts } from '@/lib/hooks/useReduxData';
 
 // Client Component - Handles real data fetching from APIs
 const UserHistory = () => {
-  // 🚀 OPTIMIZED: Use standardized query keys for data deduplication
-  const { data: users } = useGetData({ name: 'users', api: '/api/users', cacheType: 'DYNAMIC' });
-  const { data: orders } = useGetData({ name: 'orders', api: '/api/orders', cacheType: 'DYNAMIC' });
-  const { data: products } = useGetData({ name: 'products', api: '/api/products', cacheType: 'STATIC' });
+  // 🚀 OPTIMIZED: Use Redux store for centralized data caching - NO duplicate API calls
+  const { data: users } = useUsers();
+  const { data: orders } = useOrders();
+  const { data: products } = useProducts();
 
   // Process real user history data
   const userHistoryData = useMemo(() => {

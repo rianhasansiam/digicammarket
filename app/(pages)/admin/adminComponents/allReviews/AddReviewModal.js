@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Star, Upload, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useAddData } from '../../../../../lib/hooks/useAddData';
-import { useGetData } from '../../../../../lib/hooks/useGetData';
+import { useProducts } from '@/lib/hooks/useReduxData';
 import { uploadToImageBB } from '@/lib/imagebb';
 import LoadingSpinner from '../../../../componets/loading/LoadingSpinner';
 
@@ -30,10 +30,9 @@ const AddReviewModal = ({ isOpen, onClose, onReviewAdded, onSubmitStart, onSubmi
     name: 'reviews',
     api: '/api/reviews'
   });
-  const { data: productsData } = useGetData({
-    name: 'products',
-    api: '/api/products'
-  });
+  
+  // 🚀 OPTIMIZED: Use Redux store for centralized data caching - NO duplicate API calls
+  const { data: productsData } = useProducts();
 
   // Debug: Log products data to see structure
 

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useGetData } from '../../../lib/hooks/useGetData';
+import { useProducts, useUsers, useOrders, useReviews, useBusinessTracking } from '@/lib/hooks/useReduxData';
 import { 
   LayoutDashboard, 
   Package, 
@@ -65,18 +65,12 @@ const AdminPageClient = ({ adminData, navigationItems }) => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-// 🚀 OPTIMIZED: Use standardized query keys for data deduplication
-const { data: products = [], isLoading: productsLoading } = useGetData({ name: 'products', api: '/api/products', cacheType: 'STATIC' });
-const { data: users = [], isLoading: usersLoading } = useGetData({ name: 'users', api: '/api/users', cacheType: 'DYNAMIC' });
-const { data: orders = [], isLoading: ordersLoading } = useGetData({ name: 'orders', api: '/api/orders', cacheType: 'DYNAMIC' });
-const { data: reviews = [], isLoading: reviewsLoading } = useGetData({ name: 'reviews', api: '/api/reviews', cacheType: 'DYNAMIC' });
-  
-  // Fetch business tracking data
-  const { data: businessTracking = { totalRevenue: 0, totalInvestment: 0, entries: [] }, isLoading: businessLoading, refetch: refetchBusiness } = useGetData({ 
-    name: 'business-tracking', 
-    api: '/api/business-tracking', 
-    cacheType: 'DYNAMIC' 
-  });
+  // 🚀 OPTIMIZED: Use Redux store for centralized data caching - NO duplicate API calls
+  const { data: products = [], isLoading: productsLoading } = useProducts();
+  const { data: users = [], isLoading: usersLoading } = useUsers();
+  const { data: orders = [], isLoading: ordersLoading } = useOrders();
+  const { data: reviews = [], isLoading: reviewsLoading } = useReviews();
+  const { data: businessTracking = { totalRevenue: 0, totalInvestment: 0, entries: [] }, isLoading: businessLoading, refetch: refetchBusiness } = useBusinessTracking();
   
   // Shared loading state
   const isLoading = productsLoading || usersLoading || ordersLoading || reviewsLoading || businessLoading;

@@ -9,6 +9,7 @@ import AuthProvider from "../lib/AuthProvider";
 import ReactQueryProvider from "@/lib/ReactQueryProvider";
 import { LoadingProvider } from "../lib/LoadingProvider";
 import SkipNavigation from "./componets/shared/SkipNavigation";
+import DataInitializer from "./componets/shared/DataInitializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -67,14 +68,16 @@ export default function RootLayout({ children }) {
           <StoreProvider>
             <ReactQueryProvider>
               <LoadingProvider>
-                <SkipNavigation />
-                <div className="flex flex-col min-h-screen bg-white text-black">
-                  <Navbar />
-                  <main id="main-content" className="flex-grow" tabIndex={-1}>
-                    {children}
-                  </main>
-                  <Footer />
-                </div>
+                <DataInitializer>
+                  <SkipNavigation />
+                  <div className="flex flex-col min-h-screen bg-white text-black">
+                    <Navbar />
+                    <main id="main-content" className="flex-grow" tabIndex={-1}>
+                      {children}
+                    </main>
+                    <Footer />
+                  </div>
+                </DataInitializer>
               </LoadingProvider>
             </ReactQueryProvider>
           </StoreProvider>

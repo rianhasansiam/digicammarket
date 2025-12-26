@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useGetData } from '@/lib/hooks/useGetData';
+import { useProducts } from '@/lib/hooks/useReduxData';
 import { useAddData } from '@/lib/hooks/useAddData';
 import { useAppSelector, useAppDispatch } from '@/app/redux/reduxHooks';
 import { loadCartFromStorage, clearCart } from '@/app/redux/slice';
@@ -29,11 +29,8 @@ const CheckoutPageClient = () => {
   const cartItems = useAppSelector((state) => state.user.cart.items) || [];
   const cartTotalQuantity = useAppSelector((state) => state.user.cart.totalQuantity);
   
-  // Fetch products for cart item details
-  const { data: products, isLoading, error } = useGetData({
-    name: 'products',
-    api: '/api/products'
-  });
+  // 🚀 OPTIMIZED: Use Redux store for centralized data caching - NO duplicate API calls
+  const { data: products, isLoading, error } = useProducts();
 
   // Merge cart items with fresh product data to fix undefined values
   const enrichedCartItems = cartItems.map(cartItem => {

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, ShoppingCart, User, Menu, ChevronDown, Heart, LogOut, Shield } from 'lucide-react';
 import { useAppSelector } from '@/app/redux/reduxHooks';
 import { useSession, signOut } from 'next-auth/react';
-import { useGetData } from '@/lib/hooks/useGetData';
+import { useProducts, useCategories } from '@/lib/hooks/useReduxData';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -18,19 +18,9 @@ const NavbarClient = ({ navItems, defaultShopCategories }) => {
   const cartTotalQuantity = useAppSelector((state) => state.user.cart.totalQuantity);
   const wishlistTotalItems = useAppSelector((state) => state.user.wishlist.totalItems);
   
-  // 🚀 OPTIMIZED: Use standardized query keys for data deduplication
-  const { data: categoriesData, isLoading: categoriesLoading } = useGetData({
-    name: 'categories', // Standardized query key
-    api: '/api/categories',
-    cacheType: 'STATIC'
-  });
-
-  // 🚀 OPTIMIZED: Use standardized query keys for data deduplication  
-  const { data: productsData, isLoading: productsLoading } = useGetData({
-    name: 'products', // Standardized query key
-    api: '/api/products',
-    cacheType: 'STATIC' // Changed to STATIC as navbar doesn't need frequent updates
-  });
+  // 🚀 OPTIMIZED: Use Redux store for centralized data caching - NO duplicate API calls
+  const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
+  const { data: productsData, isLoading: productsLoading } = useProducts();
   
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false);
@@ -170,7 +160,7 @@ const NavbarClient = ({ navItems, defaultShopCategories }) => {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-14 sm:h-16 md:h-20">
           {/* Logo */}
           <Link href="/">
             <motion.div 
@@ -182,15 +172,15 @@ const NavbarClient = ({ navItems, defaultShopCategories }) => {
                 alt="Digicam Market"
                 width={75}
                 height={75}
-                className="rounded-lg"
+                className="rounded-lg w-10 h-10 sm:w-12 sm:h-12 md:w-[75px] md:h-[75px]"
                 priority
                 style={{ height: "auto" }}
               />
               <div className=" ">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-black bg-clip-text text-transparent">
+                <h1 className="text-base sm:text-lg md:text-2xl font-bold bg-gradient-to-r from-gray-800 to-black bg-clip-text text-transparent">
                   Digicam Market
                 </h1>
-                <p className="text-xs text-gray-500 -mt-1">Camera Accessories</p>
+                <p className="text-[10px] sm:text-xs text-gray-500 -mt-1 hidden sm:block">Camera Accessories</p>
               </div>
             </motion.div>
           </Link>
@@ -469,23 +459,23 @@ const NavbarClient = ({ navItems, defaultShopCategories }) => {
               role="navigation"
               aria-label="Mobile navigation menu"
             >
-              <nav className="py-6 space-y-2">
+              <nav className="py-3 sm:py-4 md:py-6 space-y-1 sm:space-y-2">
                 {filteredNavItems.map((item, index) => (
                   <motion.div 
                     key={item.label}
                     initial={{ opacity: 0, x: -25 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1, duration: 0.4 }}
-                    className={`px-6 py-4 rounded-xl transition-colors duration-300 ${
+                    className={`px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 md:py-4 rounded-lg sm:rounded-xl transition-colors duration-300 ${
                       pathname === item.href || (item.hasDropdown && pathname.startsWith('/shop'))
                         ? 'bg-gray-100' 
                         : 'hover:bg-gray-50'
                     }`}
                   >
                     <Link href={item.href}>
-                      <div className="flex items-center space-x-3">
-                        <span>{item.icon}</span>
-                        <span className={`font-medium ${
+                      <div className="flex items-center space-x-2 sm:space-x-3">
+                        <span className="text-sm sm:text-base">{item.icon}</span>
+                        <span className={`font-medium text-sm sm:text-base ${
                           pathname === item.href ? 'text-black' : 'text-gray-700'
                         }`}>{item.label}</span>
                         {item.badge && (
@@ -499,12 +489,12 @@ const NavbarClient = ({ navItems, defaultShopCategories }) => {
                 ))}
                 
                 {/* Mobile User Menu */}
-                <div className="border-t pt-4 mt-4">
+                <div className="border-t pt-3 sm:pt-4 mt-3 sm:mt-4">
                   {session?.user ? (
                     // Logged in user - mobile
                     <>
-                      <div className="px-6 py-4 bg-gray-50 rounded-xl mb-2">
-                        <div className="flex items-center space-x-3">
+                      <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 bg-gray-50 rounded-lg sm:rounded-xl mb-2">
+                        <div className="flex items-center space-x-2 sm:space-x-3">
                           {session.user.image ? (
                             <Image
                               src={session.user.image}

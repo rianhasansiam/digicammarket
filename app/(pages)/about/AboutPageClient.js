@@ -178,7 +178,7 @@ const AboutPageClient = ({ aboutData }) => {
               animate={isInView ? "visible" : "hidden"}
             >
               <Image
-                src={aboutData.story.image}
+                src={"/about.jpeg"}
                 alt="Our Story"
                 fill
                 className="object-cover"

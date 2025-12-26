@@ -1,33 +1,24 @@
 'use client';
 
-import { useGetData } from "@/lib/hooks/useGetData";
+import { useProducts, useCategories } from "@/lib/hooks/useReduxData";
 import LoadingSpinner from "../../componets/loading/LoadingSpinner";
 import BreadcrumbShop from './filters/BreadcrumbShop';
 import ProductsPageClient from './ProductsPageClient';
 
 export default function AllProductsPageClient() {
-  // 🚀 OPTIMIZED: Use standardized query keys for data deduplication
-  const { data: productsData, isLoading, error } = useGetData({
-    name: "products", // Standardized query key
-    api: "/api/products",
-    cacheType: 'STATIC'
-  });
-
-  const { data: categoriesData, isLoading: categoriesLoading } = useGetData({
-    name: "categories", // Standardized query key
-    api: "/api/categories", 
-    cacheType: 'STATIC'
-  });
+  // 🚀 OPTIMIZED: Use Redux store for centralized data caching - NO duplicate API calls
+  const { data: productsData, isLoading, error } = useProducts();
+  const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
 
   // Show loading state at page level
   const pageLoading = isLoading || categoriesLoading;
 
-  if (pageLoading && !productsData && !categoriesData) {
+  if (pageLoading && !productsData?.length && !categoriesData?.length) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
         <div className="text-black text-center mb-8">
-          <h1 className="text-6xl font-bold mb-4">Digicam Market</h1>
-          <p className="text-xl mb-6">Loading products...</p>
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-2 sm:mb-4">Digicam Market</h1>
+          <p className="text-base sm:text-lg md:text-xl mb-4 sm:mb-6">Loading products...</p>
         </div>
         <LoadingSpinner size="lg" color="black" />
       </div>
@@ -52,8 +43,8 @@ export default function AllProductsPageClient() {
   }
 
   return (
-    <main className="pb-20 container mx-auto">
-      <div className="max-w-frame mx-auto px-4 xl:px-0">
+    <main className="pb-12 sm:pb-16 md:pb-20 container mx-auto">
+      <div className="max-w-frame mx-auto px-2 sm:px-4 xl:px-0">
         <hr className="h-[1px] border-t-black/10 mb-5 sm:mb-6" />
         <BreadcrumbShop />
         <ProductsPageClient 

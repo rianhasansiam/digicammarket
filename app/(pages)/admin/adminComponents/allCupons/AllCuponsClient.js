@@ -19,7 +19,7 @@ import {
   XCircle,
   Clock
 } from 'lucide-react';
-import { useGetData } from '../../../../../lib/hooks/useGetData';
+import { useCoupons } from '@/lib/hooks/useReduxData';
 import { useAddData } from '../../../../../lib/hooks/useAddData';
 import { useUpdateData } from '../../../../../lib/hooks/useUpdateData';
 import { useDeleteData } from '../../../../../lib/hooks/useDeleteData';
@@ -39,21 +39,16 @@ const AllCouponsClient = () => {
   const [deletingCouponId, setDeletingCouponId] = useState(null);
   const [toast, setToast] = useState({ show: false, type: 'success', message: '' });
 
-  // 🚀 OPTIMIZED: Use standardized query keys for data deduplication
-  const { data, isLoading, error } = useGetData({
-    name: 'coupons', // Standardized query key
-    api: '/api/coupons',
-    cacheType: 'DYNAMIC'
-  });
+  // 🚀 OPTIMIZED: Use Redux store for centralized data caching - NO duplicate API calls
+  const { data, isLoading, error } = useCoupons();
 
-  // 🚀 OPTIMIZED: Use standardized query keys for data deduplication
   const { updateData, isLoading: isUpdating } = useUpdateData({
-    name: 'coupons', // Standardized query key
+    name: 'coupons',
     api: '/api/coupons'
   });
 
   const { deleteData, isLoading: isDeleting } = useDeleteData({
-    name: 'coupons', // Standardized query key
+    name: 'coupons',
     api: '/api/coupons'
   });
 

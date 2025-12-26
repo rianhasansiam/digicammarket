@@ -16,7 +16,7 @@ import {
   Clock
 } from 'lucide-react';
 import AddReviewModal from './AddReviewModal';
-import { useGetData } from '../../../../../lib/hooks/useGetData';
+import { useReviews } from '@/lib/hooks/useReduxData';
 import axios from 'axios';
 import Image from 'next/image';
 
@@ -33,11 +33,8 @@ const AllReviewsClient = ({reviewsData}) => {
   const [rejectingReviewId, setRejectingReviewId] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
   
-  // Fetch live reviews data from database
-  const { data: liveReviewsData, refetch: refetchReviews } = useGetData({
-    name: 'reviews',
-    api: '/api/reviews'
-  });
+  // 🚀 OPTIMIZED: Use Redux store for centralized data caching - NO duplicate API calls
+  const { data: liveReviewsData, refetch: refetchReviews } = useReviews();
 
   // Use live data from API (direct array response)
   const reviewsList = Array.isArray(liveReviewsData) ? liveReviewsData : [];

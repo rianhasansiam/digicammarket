@@ -1,27 +1,18 @@
 'use client';
 
-import { useGetData } from '@/lib/hooks/useGetData';
+import { useProducts, useCoupons } from '@/lib/hooks/useReduxData';
 import LoadingSpinner from '../../componets/loading/LoadingSpinner';
 import AddToCartPageClient from './AddToCartPageClient';
 
 export default function AddToCartPageWrapper() {
-  // 🚀 OPTIMIZED: Use standardized query keys for data deduplication
-  const { data: productsData, isLoading: productsLoading, error: productsError } = useGetData({
-    name: 'products', // Standardized query key
-    api: '/api/products',
-    cacheType: 'STATIC'
-  });
-
-  const { data: couponsData, isLoading: couponsLoading } = useGetData({
-    name: 'coupons', // Standardized query key
-    api: '/api/coupons',
-    cacheType: 'DYNAMIC'
-  });
+  // 🚀 OPTIMIZED: Use Redux store for centralized data caching - NO duplicate API calls
+  const { data: productsData, isLoading: productsLoading, error: productsError } = useProducts();
+  const { data: couponsData, isLoading: couponsLoading } = useCoupons();
 
   // Show loading state at page level
   const isLoading = productsLoading || couponsLoading;
 
-  if (isLoading && !productsData && !couponsData) {
+  if (isLoading && !productsData?.length && !couponsData?.length) {
     return (
       <main className="min-h-screen bg-gray-50">
         <div className="min-h-screen flex flex-col items-center justify-center">

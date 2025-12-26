@@ -17,7 +17,7 @@ import EditProductModal from './allProductsCompoment/EditProductModal';
 import DeleteConfirmationDialog from './allProductsCompoment/DeleteConfirmationDialog';
 // import AddReviewModal from './allProductsCompoment/AddReviewModal';
 import Toast from './allProductsCompoment/Toast';
-import { useGetData } from '../../../../../lib/hooks/useGetData';
+import { useProducts, useCategories } from '@/lib/hooks/useReduxData';
 import { useUpdateData } from '../../../../../lib/hooks/useUpdateData';
 import { useDeleteData } from '../../../../../lib/hooks/useDeleteData';
 
@@ -34,27 +34,18 @@ const AllProductsClient = () => {
   const [deletingProductId, setDeletingProductId] = useState(null);
   const [toast, setToast] = useState({ show: false, type: 'success', message: '' });
 
-// 🚀 OPTIMIZED: Use standardized query keys for data deduplication
-const { data, isLoading, error } = useGetData({
-  name: 'products', // Standardized query key
-  api: '/api/products',
-  cacheType: 'STATIC'
-});
+  // 🚀 OPTIMIZED: Use Redux store for centralized data caching - NO duplicate API calls
+  const { data, isLoading, error } = useProducts();
+  const { data: categoriesData, isLoading: categoriesLoading, error: categoriesError } = useCategories();
 
-// 🚀 OPTIMIZED: Use standardized query keys for data deduplication
-const { data: categoriesData, isLoading: categoriesLoading, error: categoriesError } = useGetData({
-  name: 'categories', // Standardized query key
-  api: '/api/categories',
-  cacheType: 'STATIC'
-});  // Initialize update and delete hooks
-  // 🚀 OPTIMIZED: Use standardized query keys for data deduplication
+  // Initialize update and delete hooks
   const { updateData, isLoading: isUpdating } = useUpdateData({
-    name: 'products', // Standardized query key
+    name: 'products',
     api: '/api/products'
   });
 
   const { deleteData, isLoading: isDeleting } = useDeleteData({
-    name: 'products', // Standardized query key
+    name: 'products',
     api: '/api/products'
   });
 

@@ -178,7 +178,7 @@ const ProductCard = memo(({
             whileTap={{ scale: 0.95 }}
             onClick={handleWishlistToggle}
             className={`
-              w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg
+              w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg
               ${isInWishlist 
                 ? 'bg-red-500 text-white hover:bg-red-600' 
                 : 'bg-white/90 backdrop-blur-sm text-gray-600 hover:bg-white hover:text-red-500'
@@ -188,9 +188,9 @@ const ProductCard = memo(({
             title={isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
           >
             <Heart 
-              size={18} 
+              size={14} 
               fill={isInWishlist ? 'currentColor' : 'none'}
-              className="transition-all duration-200"
+              className="transition-all duration-200 sm:w-[18px] sm:h-[18px]"
             />
           </motion.button>
         </div>
@@ -201,7 +201,7 @@ const ProductCard = memo(({
           whileTap={{ scale: 0.95 }}
           onClick={handleCartToggle}
           className={`
-            absolute bottom-3 right-3 w-10 h-10 rounded-full
+            absolute bottom-2 right-2 sm:bottom-3 sm:right-3 w-8 h-8 sm:w-10 sm:h-10 rounded-full
             flex items-center justify-center transition-all duration-200 shadow-lg
             opacity-100 translate-y-0 md:opacity-0 md:group-hover:opacity-100 md:translate-y-2 md:group-hover:translate-y-0
             ${isInCart 
@@ -213,22 +213,22 @@ const ProductCard = memo(({
           title={isInCart ? 'Remove from Cart' : 'Add to Cart'}
         >
           <ShoppingCart 
-            size={18} 
+            size={14} 
             fill={isInCart ? 'currentColor' : 'none'}
-            className="transition-all duration-200"
+            className="transition-all duration-200 sm:w-[18px] sm:h-[18px]"
           />
         </motion.button>
       </div>
 
       {/* Product Info */}
-      <div className="p-4 flex flex-col flex-grow">
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="font-semibold text-gray-900 line-clamp-2 flex-1">
+      <div className="p-2 sm:p-3 md:p-4 flex flex-col flex-grow">
+        <div className="flex items-start justify-between mb-1 sm:mb-2">
+          <h3 className="font-semibold text-gray-900 line-clamp-2 flex-1 text-xs sm:text-sm md:text-base">
             {product.name}
           </h3>
-          <div className="flex items-center space-x-1 ml-2 flex-shrink-0">
-            <Star size={14} className="text-yellow-400 fill-current" />
-            <span className="text-sm text-gray-600">
+          <div className="flex items-center space-x-0.5 sm:space-x-1 ml-1 sm:ml-2 flex-shrink-0">
+            <Star size={10} className="text-yellow-400 fill-current sm:w-[14px] sm:h-[14px]" />
+            <span className="text-[10px] sm:text-xs md:text-sm text-gray-600">
               {product.rating || '4.5'}
             </span>
           </div>
@@ -236,30 +236,30 @@ const ProductCard = memo(({
         
         {/* Brand Badge */}
         {product.brand && (
-          <div className="mb-2">
-            <span className="bg-indigo-100 text-indigo-700 px-2 py-0.5 text-xs font-semibold rounded">
+          <div className="mb-1 sm:mb-2">
+            <span className="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 text-[10px] sm:text-xs font-semibold rounded">
               {product.brand}
             </span>
           </div>
         )}
         
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2 flex-grow">
+        <p className="text-gray-600 text-[10px] sm:text-xs md:text-sm mb-2 sm:mb-3 line-clamp-2 flex-grow hidden sm:block">
           {product.shortDescription || product.description}
         </p>
         
         <div className="flex items-center justify-between mt-auto">
           <div className="flex items-center space-x-2">
-            <span className="text-xl font-bold text-gray-900">
+            <span className="text-sm sm:text-base md:text-xl font-bold text-gray-900">
               ৳{product.price}
             </span>
             {product.originalPrice && (
-              <span className="text-sm text-gray-500 line-through">
+              <span className="text-[10px] sm:text-xs md:text-sm text-gray-500 line-through">
                 ৳{product.originalPrice}
               </span>
             )}
           </div>
           
-          <span className="text-sm text-gray-500 capitalize flex-shrink-0">
+          <span className="text-[10px] sm:text-xs md:text-sm text-gray-500 capitalize flex-shrink-0">
             {product.category}
           </span>
         </div>

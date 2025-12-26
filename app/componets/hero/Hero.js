@@ -23,7 +23,7 @@ export default function Hero({ productsData, usersData, reviewsData }) {
         label: "Premium Cameras" 
       },
       { 
-        number: userCount > 0 ? `${userCount > 1000 ? Math.round(userCount/1000) + 'K' : userCount}+` : "50K+", 
+        number: userCount > 0 ? `${userCount > 1000 ? Math.round(userCount/1000) + 'K' : userCount}+` : "500+", 
         label: "Happy Photographers" 
       },
       { 
@@ -38,7 +38,7 @@ export default function Hero({ productsData, usersData, reviewsData }) {
     title: "Discover",
     subtitle: "Professional", 
     mainTitle: "Cameras",
-    description: "Capture every moment with our collection of professional cameras. Quality, performance, and innovation in every shot.",
+    description: "Capture moments the way they were meant to be remembered. A curated collection of vintage cameras. Where craftsmanship, character, and history live in every frame.",
     productName: "Professional Cameras",
     productPrice: "৳8,500",
     productEmoji: "�"

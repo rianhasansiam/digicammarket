@@ -103,11 +103,11 @@ export default function CategoryClient({ categories = [] }) {
   return (
     <div className="relative px-4">
       {/* Section Header */}
-      <div className="text-center my-12">
-        <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
+      <div className="text-center my-6 sm:my-8 md:my-12">
+        <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-black mb-2 sm:mb-4">
           SHOP BY CATEGORY
         </h2>
-        <p className="text-gray-600 text-lg">
+        <p className="text-gray-600 text-sm sm:text-base md:text-lg">
           Explore our collection of camera categories
         </p>
       </div>
@@ -143,7 +143,7 @@ export default function CategoryClient({ categories = [] }) {
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseLeave}
-          className="flex gap-6 md:gap-8 overflow-x-auto scrollbar-hide scroll-smooth py-4 cursor-grab select-none"
+          className="flex gap-3 sm:gap-5 md:gap-8 overflow-x-auto scrollbar-hide scroll-smooth py-2 sm:py-4 cursor-grab select-none justify-center"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
@@ -154,10 +154,10 @@ export default function CategoryClient({ categories = [] }) {
             <Link 
               key={category.id || category.name || index}
               href={`/allProducts?category=${encodeURIComponent(category.name)}`}
-              className="group/item flex-shrink-0 text-center min-w-[120px] md:min-w-[140px]"
+              className="group/item flex-shrink-0 text-center min-w-[80px] sm:min-w-[100px] md:min-w-[140px]"
               draggable="false"
             >
-              <div className="w-20 h-20 md:w-24 md:h-24 mx-auto mb-3 rounded-full overflow-hidden border-2 border-gray-200 group-hover/item:border-black transition-colors">
+              <div className="w-14 h-14 sm:w-18 sm:h-18 md:w-24 md:h-24 mx-auto mb-2 sm:mb-3 rounded-full overflow-hidden border-2 border-gray-200 group-hover/item:border-black transition-colors">
                 <Image
                   src={category.image}
                   alt={category.name}
@@ -170,7 +170,7 @@ export default function CategoryClient({ categories = [] }) {
                   draggable="false"
                 />
               </div>
-              <h3 className="font-semibold text-sm md:text-base text-black group-hover/item:text-gray-600 transition-colors">
+              <h3 className="font-semibold text-xs sm:text-sm md:text-base text-black group-hover/item:text-gray-600 transition-colors">
                 {category.name}
               </h3>
               {/* <p className="text-xs text-gray-500 mt-1">
