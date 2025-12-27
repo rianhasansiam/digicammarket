@@ -48,7 +48,7 @@ const Dashboard = ({ products = [], users = [], orders = [], reviews = [], isLoa
     const averageOrder = validOrdersCount > 0 ? totalRevenue / validOrdersCount : 0;
 
     // Get recent orders (last 5)
-    const recentSales = allOrders
+    const recentSales = [...allOrders]
       .sort((a, b) => new Date(b.createdAt || b.orderDate) - new Date(a.createdAt || a.orderDate))
       .slice(0, 5)
       .map(order => {

@@ -32,7 +32,7 @@ const UserHistory = () => {
       const averageOrder = totalOrders > 0 ? totalSpent / totalOrders : 0;
 
       // Get user's order history with product details
-      const orderHistory = userOrders
+      const orderHistory = [...userOrders]
         .sort((a, b) => new Date(b.createdAt || b.orderDate) - new Date(a.createdAt || a.orderDate))
         .slice(0, 10) // Limit to last 10 orders
         .map(order => ({
