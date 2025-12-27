@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { 
   X, 
   Zap, 
@@ -9,7 +10,7 @@ import {
   Calendar, 
   Tag,
   Percent,
-  Image,
+  Image as ImageIcon,
   Palette,
   Clock,
   CheckCircle
@@ -508,7 +509,7 @@ const AddSaleModal = ({ isOpen, onClose, onSuccess, products = [], categories = 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Banner Image URL (Optional)</label>
                   <div className="flex items-center space-x-2">
-                    <Image size={20} className="text-gray-400" />
+                    <ImageIcon size={20} className="text-gray-400" />
                     <input
                       type="url"
                       value={formData.bannerImage}
@@ -589,10 +590,13 @@ const AddSaleModal = ({ isOpen, onClose, onSuccess, products = [], categories = 
                               )}
                             </div>
                             {product.primaryImage && (
-                              <img
+                              <Image
                                 src={product.primaryImage}
                                 alt={product.name}
+                                width={40}
+                                height={40}
                                 className="w-10 h-10 rounded object-cover"
+                                unoptimized
                               />
                             )}
                             <div className="flex-1 min-w-0">

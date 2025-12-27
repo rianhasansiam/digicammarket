@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { 
   Zap, 
   Clock, 
@@ -253,10 +254,13 @@ const SaleCard = ({ sale, products = [] }) => {
                     >
                       <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-white overflow-hidden shadow-lg">
                         {product.primaryImage ? (
-                          <img 
+                          <Image 
                             src={product.primaryImage} 
                             alt={product.name}
+                            width={56}
+                            height={56}
                             className="w-full h-full object-cover"
+                            unoptimized
                           />
                         ) : (
                           <div 
@@ -350,7 +354,7 @@ const FlashSale = ({ salesData = [], productsData = [] }) => {
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
                 Hot Deals
               </h2>
-              <p className="text-gray-600 text-sm">Limited time offers you don't want to miss!</p>
+              <p className="text-gray-600 text-sm">Limited time offers you don&apos;t want to miss!</p>
             </div>
           </div>
 

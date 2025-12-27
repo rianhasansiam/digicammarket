@@ -707,6 +707,7 @@ const OrderDetails = ({ ordersData }) => {
                         {selectedOrder.paymentMethod.advancePayment.screenshot ? (
                           <div className="relative group">
                             <div className="bg-white rounded-xl p-2 shadow-sm border border-gray-200 overflow-hidden">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img 
                                 src={selectedOrder.paymentMethod.advancePayment.screenshot} 
                                 alt="Payment proof screenshot"
