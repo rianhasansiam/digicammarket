@@ -118,13 +118,30 @@ const WishlistProductCard = ({ product, onRemove, onAddToCart, isSelected, onSel
           src={product.image || PLACEHOLDER_IMAGES.PRODUCT_LARGE}
           alt={product.name}
           fill
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
+          className={`object-cover group-hover:scale-105 transition-transform duration-500 ${
+            product.stockCount === 0 || !product.inStock ? 'grayscale opacity-60' : ''
+          }`}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           unoptimized={true}
           onError={(e) => {
             e.target.src = PLACEHOLDER_IMAGES.PRODUCT_LARGE;
           }}
         />
+        
+        {/* SOLD OUT Overlay - Premium Design */}
+        {(product.stockCount === 0 || product.stock === 0 || !product.inStock) && (
+          <div className="absolute inset-0 flex items-center justify-center z-10 bg-black/20">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-red-700 via-red-600 to-red-700 blur-sm opacity-80"></div>
+              <div className="relative bg-gradient-to-r from-red-800 via-red-600 to-red-800 text-white px-4 py-2 sm:px-6 sm:py-2.5 border border-red-400/30 shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent"></div>
+                <span className="relative text-[10px] sm:text-xs md:text-sm font-semibold tracking-[0.2em] sm:tracking-[0.3em] uppercase">
+                  Sold Out
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Product Info */}

@@ -210,43 +210,88 @@ const HeroClient = ({
                 </div>
               </motion.div>
 
-              {/* Floating Elements */}
+              {/* Floating Elements - Premium Brand Cards with Logo Images */}
               <motion.div
                 animate={{ 
-                  y: [0, -10, 0],
+                  y: [0, -12, 0],
                   x: [0, 5, 0],
-                  rotate: [0, 10, 0]
                 }}
-                transition={{ duration: 5, repeat: Infinity, delay: 0.5 }}
-                className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20"
+                transition={{ duration: 5, repeat: Infinity, delay: 0.5, ease: "easeInOut" }}
+                className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 group cursor-pointer"
               >
-                <div className="text-xl sm:text-2xl">✨</div>
-                <p className="text-xs text-white/70 mt-1">4K Video</p>
+                <div className="relative bg-gradient-to-br from-white/95 to-gray-100 backdrop-blur-md rounded-xl p-2 sm:p-2.5 border border-white/50 shadow-lg shadow-black/20 overflow-hidden hover:scale-105 transition-transform duration-300">
+                  {/* Shine effect */}
+                  <motion.div 
+                    animate={{ x: [-100, 100] }}
+                    transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent skew-x-12"
+                  />
+                  <div className="relative flex items-center justify-center">
+                    <Image 
+                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Canon_wordmark.svg/200px-Canon_wordmark.svg.png"
+                      alt="Canon"
+                      width={60}
+                      height={24}
+                      className="h-4 sm:h-5 w-auto object-contain"
+                      unoptimized
+                    />
+                  </div>
+                </div>
               </motion.div>
 
               <motion.div
                 animate={{ 
                   y: [0, 10, 0],
                   x: [0, -5, 0],
-                  rotate: [0, -10, 0]
                 }}
-                transition={{ duration: 4, repeat: Infinity, delay: 1 }}
-                className="absolute -bottom-2 -left-4 sm:-bottom-4 sm:-left-6 bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20"
+                transition={{ duration: 4, repeat: Infinity, delay: 1, ease: "easeInOut" }}
+                className="absolute -bottom-1 -left-2 sm:-bottom-2 sm:-left-4 group cursor-pointer"
               >
-                <div className="text-xl sm:text-2xl">🎯</div>
-                <p className="text-xs text-white/70 mt-1">Auto Focus</p>
+                <div className="relative bg-gradient-to-br from-white/95 to-gray-100 backdrop-blur-md rounded-xl p-2 sm:p-2.5 border border-white/50 shadow-lg shadow-black/20 overflow-hidden hover:scale-105 transition-transform duration-300">
+                  {/* Shine effect */}
+                  <motion.div 
+                    animate={{ x: [-100, 100] }}
+                    transition={{ duration: 3, repeat: Infinity, repeatDelay: 3, delay: 1 }}
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent skew-x-12"
+                  />
+                  <div className="relative flex items-center justify-center">
+                    <Image 
+                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sony_logo.svg/200px-Sony_logo.svg.png"
+                      alt="Sony"
+                      width={50}
+                      height={20}
+                      className="h-3.5 sm:h-4 w-auto object-contain"
+                      unoptimized
+                    />
+                  </div>
+                </div>
               </motion.div>
 
               <motion.div
                 animate={{ 
                   y: [0, -8, 0],
-                  rotate: [0, -5, 0]
                 }}
-                transition={{ duration: 6, repeat: Infinity, delay: 0.8 }}
-                className="absolute top-1/2 -right-8 sm:-right-12 bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20"
+                transition={{ duration: 6, repeat: Infinity, delay: 0.8, ease: "easeInOut" }}
+                className="absolute top-1/2 -right-6 sm:-right-8 group cursor-pointer"
               >
-                <div className="text-xl sm:text-2xl">📸</div>
-                <p className="text-xs text-white/70 mt-1">50MP</p>
+                <div className="relative bg-white backdrop-blur-md rounded-xl p-2 sm:p-2.5 border border-blue-400 shadow-lg shadow-blue-500/30 overflow-hidden hover:scale-105 transition-transform duration-300">
+                  {/* Shine effect */}
+                  <motion.div 
+                    animate={{ x: [-100, 100] }}
+                    transition={{ duration: 3, repeat: Infinity, repeatDelay: 4, delay: 2 }}
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12"
+                  />
+                  <div className="relative flex items-center justify-center">
+                    <Image 
+                      src="https://i.ibb.co/DfbZ3FZb/IMG-4604.png"
+                      alt="Samsung"
+                      width={100}
+                      height={100}
+                      className="h-4 sm:h-5 w-auto object-contain"
+                      unoptimized
+                    />
+                  </div>
+                </div>
               </motion.div>
             </div>
 

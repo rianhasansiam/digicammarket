@@ -93,6 +93,15 @@ const initialState = {
     cacheType: 'DYNAMIC'
   },
 
+  // Sales (Flash Sales, Bundle Sales, etc.)
+  sales: {
+    data: [],
+    isLoading: false,
+    error: null,
+    lastFetched: null,
+    cacheType: 'DYNAMIC'
+  },
+
   // Global fetch status
   globalLoading: false,
   initialDataLoaded: false
@@ -296,6 +305,28 @@ export const fetchBusinessTracking = createAsyncThunk(
   }
 );
 
+// Fetch Sales
+export const fetchSales = createAsyncThunk(
+  'data/fetchSales',
+  async ({ activeOnly = false } = {}, { getState, rejectWithValue }) => {
+    const { data: dataState } = getState();
+    const { sales } = dataState;
+    
+    // For all sales without filters, use cache
+    if (!activeOnly && sales.data.length > 0 && isCacheValid(sales.lastFetched, sales.cacheType)) {
+      return { data: sales.data, fromCache: true };
+    }
+    
+    try {
+      const url = activeOnly ? '/api/sales?active=true' : '/api/sales';
+      const response = await axios.get(url);
+      return { data: response.data, fromCache: false, isFiltered: activeOnly };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 // Fetch Initial Data (products, categories, reviews) - reduces initial API calls
 export const fetchInitialData = createAsyncThunk(
   'data/fetchInitialData',
@@ -468,6 +499,27 @@ export const dataSlice = createSlice({
       const couponId = action.payload;
       state.coupons.data = state.coupons.data.filter(c => 
         c._id !== couponId && c.id !== couponId
+      );
+    },
+
+    // Update a single sale
+    updateSale: (state, action) => {
+      const updatedSale = action.payload;
+      const index = state.sales.data.findIndex(s => 
+        s._id === updatedSale._id || s.id === updatedSale.id
+      );
+      if (index !== -1) {
+        state.sales.data[index] = updatedSale;
+      } else {
+        state.sales.data.push(updatedSale);
+      }
+    },
+    
+    // Remove a sale
+    removeSale: (state, action) => {
+      const saleId = action.payload;
+      state.sales.data = state.sales.data.filter(s => 
+        s._id !== saleId && s.id !== saleId
       );
     },
 
@@ -672,6 +724,24 @@ export const dataSlice = createSlice({
         state.businessTracking.isLoading = false;
         state.businessTracking.error = action.payload;
       })
+
+    // Sales
+    builder
+      .addCase(fetchSales.pending, (state) => {
+        state.sales.isLoading = true;
+        state.sales.error = null;
+      })
+      .addCase(fetchSales.fulfilled, (state, action) => {
+        state.sales.isLoading = false;
+        if (!action.payload.fromCache && !action.payload.isFiltered) {
+          state.sales.data = action.payload.data;
+          state.sales.lastFetched = Date.now();
+        }
+      })
+      .addCase(fetchSales.rejected, (state, action) => {
+        state.sales.isLoading = false;
+        state.sales.error = action.payload;
+      })
     
     // Initial Data Load
     builder
@@ -704,6 +774,8 @@ export const {
   removeOrder,
   updateCoupon,
   removeCoupon,
+  updateSale,
+  removeSale,
   updateShippingTaxSettings,
   setProductsData,
   setCategoriesData,
@@ -721,6 +793,7 @@ export const selectCoupons = (state) => state.data.coupons;
 export const selectContacts = (state) => state.data.contacts;
 export const selectShippingTaxSettings = (state) => state.data.shippingTaxSettings;
 export const selectBusinessTracking = (state) => state.data.businessTracking;
+export const selectSales = (state) => state.data.sales;
 export const selectGlobalLoading = (state) => state.data.globalLoading;
 export const selectInitialDataLoaded = (state) => state.data.initialDataLoaded;
 

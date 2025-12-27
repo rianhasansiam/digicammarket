@@ -61,9 +61,10 @@ const OrderDetails = ({ orders = [], users = [], products = [], isLoading = fals
           ? `${customerInfo.address.street || customerInfo.address.address || ''}, ${customerInfo.address.city || ''}, ${customerInfo.address.zipCode || customerInfo.address.zip || ''}`.replace(/^,\s*|,\s*$/g, '') 
           : customerInfo.shippingAddress || 'No address provided',
         trackingNumber: order.trackingNumber || order.tracking || (order._id ? `TN${order._id.slice(-9)}` : `TN${Date.now().toString().slice(-9)}`),
+        // Preserve full paymentMethod object including advancePayment
         paymentMethod: order.paymentMethod || order.payment || { 
-          name: order.paymentMethod?.name || order.payment?.name || order.paymentMethodName || order.paymentType || 'Unknown', 
-          type: order.paymentMethod?.type || order.payment?.type || order.paymentMethodType || order.paymentType || 'unknown' 
+          name: order.paymentMethodName || order.paymentType || 'Unknown', 
+          type: order.paymentMethodType || order.paymentType || 'unknown' 
         },
         products: orderProducts,
         customerInfo: customerInfo // Include full customer info for detailed view

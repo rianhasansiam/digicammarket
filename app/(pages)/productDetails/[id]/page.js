@@ -358,16 +358,33 @@ export default function ProductDetailPage({ params }) {
         {/* Product Images */}
         <div className="space-y-4">
           {/* Main Image */}
-          <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+          <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
             <OptimizedImage
               src={product.images?.[selectedImageIndex] || product.primaryImage || product.image || product.images?.[0]}
               alt={product.name}
               width={600}
               height={600}
-              className="w-full h-full object-cover transition-opacity duration-300"
+              className={`w-full h-full object-cover transition-opacity duration-300 ${
+                product.stock === 0 ? 'grayscale opacity-60' : ''
+              }`}
               key={selectedImageIndex}
               priority={true}
             />
+            
+            {/* SOLD OUT Overlay - Premium Design */}
+            {product.stock === 0 && (
+              <div className="absolute inset-0 flex items-center justify-center z-10 bg-black/20">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-red-700 via-red-600 to-red-700 blur-md opacity-80"></div>
+                  <div className="relative bg-gradient-to-r from-red-800 via-red-600 to-red-800 text-white px-8 py-3 md:px-10 md:py-4 border border-red-400/30 shadow-2xl">
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent"></div>
+                    <span className="relative text-base md:text-lg font-semibold tracking-[0.3em] uppercase">
+                      Sold Out
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
           
           {/* Image Thumbnails */}

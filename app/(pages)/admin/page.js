@@ -11,7 +11,8 @@ import {
   History,
   Shield,
   Settings,
-  Mail
+  Mail,
+  Flame
 } from 'lucide-react';
 
 // Import admin components directly (no wrapper layers)
@@ -24,6 +25,7 @@ import AllCuponsClient from './adminComponents/allCupons/AllCuponsClient';
 import AllCategoryClient from './adminComponents/allCategory/AllCategoryClient';
 import ShippingTaxSettings from './adminComponents/shippingTax/ShippingTaxSettings';
 import AllMessages from './adminComponents/allMessages/AllMessages';
+import AllSalesClient from './adminComponents/allSales/AllSalesClient';
 
 
 // Metadata for SEO - Admin Panel
@@ -125,6 +127,13 @@ export default function AdminPage() {
       icon: Ticket,
       component: AllCuponsClient,
       description: 'Discount Coupons'
+    },
+    {
+      id: 'sales',
+      name: 'Sales & Promotions',
+      icon: Flame,
+      component: AllSalesClient,
+      description: 'Flash Sales & Bundle Deals'
     },
     {
       id: 'shipping-tax',

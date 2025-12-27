@@ -1,11 +1,13 @@
 'use client';
 
-import { useProducts, useCategories, useReviews, useUsers } from '@/lib/hooks/useReduxData';
+import { useProducts, useCategories, useReviews, useUsers, useSales } from '@/lib/hooks/useReduxData';
 import GlobalLoadingPage from './componets/loading/GlobalLoadingPage';
 import Hero from './componets/hero/Hero';
 import Category from './componets/category/Category';
 import FeaturedProducts from './componets/featuredProducts/FeaturedProducts';
 import Review from './componets/review/Review';
+import FlashSale from './componets/flashSale/FlashSale';
+import SaleBanner from './componets/flashSale/SaleBanner';
 import StructuredData, { MultipleStructuredData } from './componets/shared/StructuredData';
 
 export default function HomePageClient() {
@@ -14,6 +16,7 @@ export default function HomePageClient() {
   const { data: categoriesData, isLoading: categoriesLoading, error: categoriesError } = useCategories();
   const { data: reviewsData, isLoading: reviewsLoading, error: reviewsError } = useReviews();
   const { data: usersData, isLoading: usersLoading, error: usersError } = useUsers();
+  const { data: salesData, isLoading: salesLoading } = useSales();
 
   // Show loading state at page level while critical data is loading
   const isLoading = productsLoading || categoriesLoading || reviewsLoading || usersLoading;
@@ -84,10 +87,18 @@ export default function HomePageClient() {
       ]} />
 
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 opacity-0 animate-fadeIn">
+        {/* 🔥 Sale Banner - Top of page for maximum visibility */}
+        <SaleBanner salesData={salesData || []} />
+        
         <Hero 
           productsData={productsData} 
           usersData={usersData} 
           reviewsData={approvedReviews} 
+        />
+        {/* Detailed Flash Sale Section */}
+        <FlashSale 
+          salesData={salesData || []} 
+          productsData={productsData || []} 
         />
         <Category categoriesData={categoriesData} />
         <FeaturedProducts productsData={productsData} />

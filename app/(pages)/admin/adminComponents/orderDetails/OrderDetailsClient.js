@@ -20,7 +20,11 @@ import {
   Edit3,
   ChevronDown,
   X,
-  Trash2
+  Trash2,
+  CreditCard,
+  Phone,
+  Image as ImageIcon,
+  ExternalLink
 } from 'lucide-react';
 
 const OrderDetails = ({ ordersData }) => {
@@ -625,6 +629,110 @@ const OrderDetails = ({ ordersData }) => {
                     </div>
                   </div>
                 </div>
+
+                {/* Payment Proof Section - For Advance Payment */}
+                {selectedOrder.paymentMethod?.advancePayment && (
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+                    <div className="flex items-center gap-2 mb-4">
+                      <CreditCard className="text-green-600" size={20} />
+                      <h3 className="text-lg font-semibold text-gray-900">Payment Proof (15% Advance)</h3>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Payment Details */}
+                      <div className="space-y-4">
+                        <div className="bg-white rounded-lg p-4 shadow-sm">
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</label>
+                          <p className="text-gray-900 font-semibold text-lg mt-1 capitalize">
+                            {selectedOrder.paymentMethod.advancePayment.method === 'bkash' ? (
+                              <span className="text-pink-600">bKash</span>
+                            ) : selectedOrder.paymentMethod.advancePayment.method === 'nagad' ? (
+                              <span className="text-orange-600">Nagad</span>
+                            ) : (
+                              selectedOrder.paymentMethod.advancePayment.method
+                            )}
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white rounded-lg p-4 shadow-sm">
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center gap-1">
+                            <Phone size={12} /> Payment Phone Number
+                          </label>
+                          <p className="text-gray-900 font-mono text-lg mt-1">
+                            {selectedOrder.paymentMethod.advancePayment.phoneNumber || 'Not provided'}
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white rounded-lg p-4 shadow-sm">
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction ID</label>
+                          <p className="text-gray-900 font-mono text-lg mt-1 break-all">
+                            {selectedOrder.paymentMethod.advancePayment.transactionId || 'Not provided'}
+                          </p>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="bg-white rounded-lg p-4 shadow-sm">
+                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Advance Paid</label>
+                            <p className="text-green-600 font-bold text-xl mt-1">
+                              ৳{selectedOrder.paymentMethod.advancePayment.amount || 0}
+                            </p>
+                          </div>
+                          <div className="bg-white rounded-lg p-4 shadow-sm">
+                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Remaining (COD)</label>
+                            <p className="text-orange-600 font-bold text-xl mt-1">
+                              ৳{selectedOrder.paymentMethod.advancePayment.remainingAmount || 0}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {selectedOrder.paymentMethod.advancePayment.paidAt && (
+                          <div className="bg-white rounded-lg p-4 shadow-sm">
+                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Date & Time</label>
+                            <p className="text-gray-900 mt-1">
+                              {new Date(selectedOrder.paymentMethod.advancePayment.paidAt).toLocaleString('en-BD', {
+                                dateStyle: 'medium',
+                                timeStyle: 'short'
+                              })}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Payment Screenshot */}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <ImageIcon size={16} className="text-gray-600" />
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Screenshot</label>
+                        </div>
+                        {selectedOrder.paymentMethod.advancePayment.screenshot ? (
+                          <div className="relative group">
+                            <div className="bg-white rounded-xl p-2 shadow-sm border border-gray-200 overflow-hidden">
+                              <img 
+                                src={selectedOrder.paymentMethod.advancePayment.screenshot} 
+                                alt="Payment proof screenshot"
+                                className="w-full h-auto max-h-80 object-contain rounded-lg"
+                              />
+                            </div>
+                            <a 
+                              href={selectedOrder.paymentMethod.advancePayment.screenshot}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="absolute top-4 right-4 bg-black/70 hover:bg-black text-white px-3 py-2 rounded-lg flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <ExternalLink size={14} />
+                              <span className="text-sm">View Full</span>
+                            </a>
+                          </div>
+                        ) : (
+                          <div className="bg-white rounded-xl p-8 shadow-sm border border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400">
+                            <ImageIcon size={48} className="mb-2 opacity-50" />
+                            <p className="text-sm">No screenshot uploaded</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Action Buttons */}
                 <div className="flex justify-between items-center pt-4 border-t border-gray-200">

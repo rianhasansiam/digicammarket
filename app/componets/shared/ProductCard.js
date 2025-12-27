@@ -93,6 +93,10 @@ const ProductCard = memo(({
     [product.originalPrice, product.price]
   );
 
+  // Check stock - support both stockCount and stock fields
+  const stockAmount = product.stockCount ?? product.stock ?? null;
+  const isOutOfStock = stockAmount === 0;
+
   // Memoized event handlers
   const handleCartToggle = useCallback((e) => {
     e.stopPropagation();
@@ -160,12 +164,29 @@ const ProductCard = memo(({
         <OptimizedImage
           src={product.primaryImage || product.imageUrl || product.image}
           alt={product.name || 'Product'}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${
+            isOutOfStock ? 'grayscale opacity-60' : ''
+          }`}
           priority={priority}
         />
         
+        {/* SOLD OUT Text Overlay - Premium Design */}
+        {isOutOfStock && (
+          <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/20">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-red-700 via-red-600 to-red-700 blur-sm opacity-80"></div>
+              <div className="relative bg-gradient-to-r from-red-800 via-red-600 to-red-800 text-white px-4 py-2 sm:px-6 sm:py-2.5 border border-red-400/30 shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent"></div>
+                <span className="relative text-[10px] sm:text-xs md:text-sm font-semibold tracking-[0.2em] sm:tracking-[0.3em] uppercase">
+                  Sold Out
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Discount Badge */}
-        {discount > 0 && (
+        {discount > 0 && !isOutOfStock && (
           <Badge variant="destructive" className="absolute top-3 left-3 z-10">
             -{discount}%
           </Badge>
@@ -197,20 +218,23 @@ const ProductCard = memo(({
 
         {/* Quick Add to Cart Button - Toggle Style */}
         <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleCartToggle}
+          whileHover={{ scale: isOutOfStock ? 1 : 1.1 }}
+          whileTap={{ scale: isOutOfStock ? 1 : 0.95 }}
+          onClick={isOutOfStock ? (e) => e.stopPropagation() : handleCartToggle}
+          disabled={isOutOfStock}
           className={`
             absolute bottom-2 right-2 sm:bottom-3 sm:right-3 w-8 h-8 sm:w-10 sm:h-10 rounded-full
             flex items-center justify-center transition-all duration-200 shadow-lg
             opacity-100 translate-y-0 md:opacity-0 md:group-hover:opacity-100 md:translate-y-2 md:group-hover:translate-y-0
-            ${isInCart 
-              ? 'bg-green-500 text-white hover:bg-green-600' 
-              : 'bg-black text-white hover:bg-gray-800'
+            ${isOutOfStock 
+              ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+              : isInCart 
+                ? 'bg-green-500 text-white hover:bg-green-600' 
+                : 'bg-black text-white hover:bg-gray-800'
             }
             ${justAdded.cart ? 'animate-bounce' : ''}
           `}
-          title={isInCart ? 'Remove from Cart' : 'Add to Cart'}
+          title={isOutOfStock ? 'Out of Stock' : isInCart ? 'Remove from Cart' : 'Add to Cart'}
         >
           <ShoppingCart 
             size={14} 
@@ -265,14 +289,30 @@ const ProductCard = memo(({
         </div>
 
         {/* Stock Status */}
-        {product.stockCount !== undefined && (
+        {stockAmount !== null && (
           <div className="mt-2">
-            <Badge 
-              variant={product.stockCount > 0 ? 'default' : 'destructive'}
-              className="text-xs"
-            >
-              {product.stockCount > 0 ? `${product.stockCount} in stock` : 'Out of stock'}
-            </Badge>
+            {isOutOfStock ? (
+              <Badge 
+                variant="destructive"
+                className="text-xs animate-pulse"
+              >
+                ❌ Out of Stock
+              </Badge>
+            ) : stockAmount <= 5 ? (
+              <Badge 
+                variant="default"
+                className="text-xs bg-orange-100 text-orange-700"
+              >
+                ⚠️ Only {stockAmount} left
+              </Badge>
+            ) : (
+              <Badge 
+                variant="default"
+                className="text-xs bg-green-100 text-green-700"
+              >
+                ✓ In Stock ({stockAmount})
+              </Badge>
+            )}
           </div>
         )}
       </div>
