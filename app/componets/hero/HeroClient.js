@@ -132,70 +132,134 @@ const HeroClient = ({
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative"
+            className="relative flex items-center justify-center"
           >
-            <div className="relative z-10">
+            {/* Main Camera Illustration */}
+            <div className="relative">
+              {/* Rotating Ring */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="absolute inset-0 w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 border-2 border-dashed border-white/20 rounded-full"
+              />
+              
+              {/* Camera Body */}
               <motion.div
                 animate={{ 
-                  y: [0, -20, 0],
-                  rotate: [0, 2, 0]
+                  y: [0, -15, 0],
                 }}
                 transition={{ 
-                  duration: 6,
+                  duration: 4,
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
-                className="bg-white/10 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-white/20"
+                className="relative z-10 w-56 h-56 sm:w-72 sm:h-72 md:w-80 md:h-80"
               >
-                <div className="space-y-3 sm:space-y-4 md:space-y-6">
-                  <div className="h-28 sm:h-36 md:h-48 bg-gradient-to-br from-white/20 to-white/5 rounded-xl sm:rounded-2xl flex items-center justify-center relative overflow-hidden">
-                    {/* Camera showcase with multiple elements */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-white/5 to-transparent mix-blend-soft-light"></div>
-                    <div className="relative z-10 flex flex-col items-center space-y-2 sm:space-y-3 md:space-y-4">
-                      <div className="flex space-x-2 sm:space-x-3 md:space-x-4">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-white/20 rounded-full flex items-center justify-center text-2xl sm:text-3xl md:text-4xl backdrop-blur-sm">
-                          📹
-                        </div>
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-white/20 rounded-full flex items-center justify-center text-2xl sm:text-3xl md:text-4xl backdrop-blur-sm">
-                          📷
+                {/* Camera Frame */}
+                <div className="absolute inset-4 sm:inset-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl shadow-2xl border border-white/10 overflow-hidden">
+                  {/* Camera Top */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 sm:w-20 h-6 sm:h-8 bg-gray-700 rounded-lg border border-white/10"></div>
+                  
+                  {/* Lens */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <motion.div
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="relative"
+                    >
+                      {/* Outer Ring */}
+                      <div className="w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 p-2 shadow-lg">
+                        {/* Inner Ring */}
+                        <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-700 to-gray-900 p-2">
+                          {/* Glass */}
+                          <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-900 via-gray-900 to-black relative overflow-hidden">
+                            {/* Lens Reflection */}
+                            <motion.div
+                              animate={{ 
+                                x: [-20, 60, -20],
+                                opacity: [0.3, 0.6, 0.3]
+                              }}
+                              transition={{ duration: 3, repeat: Infinity }}
+                              className="absolute top-2 left-2 w-8 h-8 sm:w-12 sm:h-12 bg-white/30 rounded-full blur-md"
+                            />
+                            {/* Aperture Lines */}
+                            <div className="absolute inset-4 border-2 border-white/10 rounded-full"></div>
+                            <div className="absolute inset-8 border border-white/5 rounded-full"></div>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex space-x-2 sm:space-x-3 md:space-x-4">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white/15 rounded-lg flex items-center justify-center text-xl sm:text-2xl md:text-3xl backdrop-blur-sm">
-                          📸
-                        </div>
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white/15 rounded-lg flex items-center justify-center text-xl sm:text-2xl md:text-3xl backdrop-blur-sm">
-                          🎥
-                        </div>
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white/15 rounded-lg flex items-center justify-center text-xl sm:text-2xl md:text-3xl backdrop-blur-sm">
-                          💡
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Floating decorative elements */}
-                    <div className="absolute top-4 right-4 w-8 h-8 bg-white/10 rounded-full blur-sm"></div>
-                    <div className="absolute bottom-6 left-6 w-6 h-6 bg-white/15 rounded-full blur-sm"></div>
-                    <div className="absolute top-1/2 left-4 w-4 h-4 bg-white/20 rounded-full blur-sm"></div>
+                    </motion.div>
                   </div>
-                  <div className="space-y-1 sm:space-y-2">
-                    <h3 className="text-sm sm:text-base md:text-xl font-semibold">{productName}</h3>
-                    <p className="text-gray-300 text-xs sm:text-sm md:text-base">Handcrafted quality — Free shipping & returns</p>
-                  </div>
+                  
+                  {/* Flash */}
+                  <motion.div
+                    animate={{ 
+                      opacity: [0.5, 1, 0.5],
+                      boxShadow: [
+                        '0 0 10px rgba(255,255,255,0.3)',
+                        '0 0 20px rgba(255,255,255,0.6)',
+                        '0 0 10px rgba(255,255,255,0.3)'
+                      ]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute top-4 right-4 w-4 h-4 sm:w-5 sm:h-5 bg-white rounded-full"
+                  />
+                  
+                  {/* Viewfinder */}
+                  <div className="absolute top-4 left-4 w-6 h-4 sm:w-8 sm:h-5 bg-gray-600 rounded border border-white/10"></div>
                 </div>
+              </motion.div>
+
+              {/* Floating Elements */}
+              <motion.div
+                animate={{ 
+                  y: [0, -10, 0],
+                  x: [0, 5, 0],
+                  rotate: [0, 10, 0]
+                }}
+                transition={{ duration: 5, repeat: Infinity, delay: 0.5 }}
+                className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20"
+              >
+                <div className="text-xl sm:text-2xl">✨</div>
+                <p className="text-xs text-white/70 mt-1">4K Video</p>
+              </motion.div>
+
+              <motion.div
+                animate={{ 
+                  y: [0, 10, 0],
+                  x: [0, -5, 0],
+                  rotate: [0, -10, 0]
+                }}
+                transition={{ duration: 4, repeat: Infinity, delay: 1 }}
+                className="absolute -bottom-2 -left-4 sm:-bottom-4 sm:-left-6 bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20"
+              >
+                <div className="text-xl sm:text-2xl">🎯</div>
+                <p className="text-xs text-white/70 mt-1">Auto Focus</p>
+              </motion.div>
+
+              <motion.div
+                animate={{ 
+                  y: [0, -8, 0],
+                  rotate: [0, -5, 0]
+                }}
+                transition={{ duration: 6, repeat: Infinity, delay: 0.8 }}
+                className="absolute top-1/2 -right-8 sm:-right-12 bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20"
+              >
+                <div className="text-xl sm:text-2xl">📸</div>
+                <p className="text-xs text-white/70 mt-1">50MP</p>
               </motion.div>
             </div>
 
-            {/* Background Elements */}
+            {/* Background Glow Effects */}
             <motion.div
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 8, repeat: Infinity }}
-              className="absolute -top-10 -right-10 w-72 h-72 bg-white/5 rounded-full blur-3xl"
+              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+              transition={{ duration: 6, repeat: Infinity }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 sm:w-80 sm:h-80 bg-blue-500/20 rounded-full blur-3xl"
             />
             <motion.div
-              animate={{ scale: [1.1, 1, 1.1] }}
-              transition={{ duration: 10, repeat: Infinity }}
-              className="absolute -bottom-10 -left-10 w-96 h-96 bg-gray-700/20 rounded-full blur-3xl"
+              animate={{ scale: [1.1, 1, 1.1], opacity: [0.2, 0.4, 0.2] }}
+              transition={{ duration: 8, repeat: Infinity }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"
             />
           </motion.div>
         </div>
