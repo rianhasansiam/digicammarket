@@ -18,7 +18,7 @@ const getInitialState = (products = []) => {
     sizes: [],
     style: '',
     inStock: false,
-    sortBy: 'most-popular'
+    sortBy: 'newest'
   };
 };
 
@@ -150,7 +150,7 @@ const buildUrlParams = (filters) => {
   if (filters.search) params.set('search', filters.search);
   if (filters.category) params.set('category', filters.category);
   if (filters.style) params.set('style', filters.style);
-  if (filters.sortBy !== 'most-popular') params.set('sort', filters.sortBy);
+  if (filters.sortBy !== 'newest') params.set('sort', filters.sortBy);
   if (filters.inStock) params.set('inStock', 'true');
   
   if (filters.priceRange.min > 0) params.set('minPrice', filters.priceRange.min.toString());

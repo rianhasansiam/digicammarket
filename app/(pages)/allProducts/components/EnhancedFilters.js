@@ -39,7 +39,7 @@ const EnhancedFilters = ({ categoriesData, products }) => {
       sizes: [],
       style: '',
       inStock: false,
-      sortBy: 'most-popular'
+      sortBy: 'newest'
     };
     clearAllFilters(initialState);
   };

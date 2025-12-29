@@ -2,11 +2,11 @@
 
 import React, { memo, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Eye, ShoppingCart, Star } from 'lucide-react';
+import { Heart, ShoppingCart, Star } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/app/redux/reduxHooks';
 import { addToCart, addToWishlist, removeFromWishlist, removeFromCart } from '@/app/redux/slice';
-import { toggleUtils, calculateDiscount, formatPrice, stockUtils } from '@/lib/utils/productUtils';
+import { toggleUtils, calculateDiscount } from '@/lib/utils/productUtils';
 import Image from 'next/image';
 
 // Shared Badge component
@@ -138,11 +138,6 @@ const ProductCard = memo(({
     const productId = product.id || product._id;
     router.push(`/productDetails/${productId}`);
   }, [onProductClick, router, product.id, product._id]);
-
-  const handleQuickView = useCallback((e) => {
-    e.stopPropagation();
-    // Quick view modal logic could be added here
-  }, []);
 
   return (
     <motion.div

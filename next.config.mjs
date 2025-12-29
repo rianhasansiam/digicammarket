@@ -60,6 +60,7 @@ const nextConfig = {
   experimental: {
     optimizeCss: true,
     optimizePackageImports: ['lucide-react', 'framer-motion'],
+    scrollRestoration: true,
   },
 
   async headers() {
@@ -84,26 +85,14 @@ const nextConfig = {
     ]
   },
 
-  // Suppress router scroll warnings for loading overlays
   logging: {
     fetches: {
       fullUrl: true,
     },
   },
   
-  // Suppress development warnings
   typescript: {
     ignoreBuildErrors: false,
-  },
-  
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
-
-  // Experimental features
-  experimental: {
-    // Suppress scroll restoration warnings
-    scrollRestoration: true,
   },
 };
 

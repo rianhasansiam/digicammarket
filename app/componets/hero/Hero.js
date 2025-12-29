@@ -19,15 +19,15 @@ export default function Hero({ productsData, usersData, reviewsData }) {
 
     return [
       { 
-        number: "500+", 
+        number: productCount > 0 ? `${productCount}+` : "500+", 
         label: "Premium Cameras" 
       },
       { 
-        number:"500+", 
+        number: userCount > 0 ? `${userCount}+` : "500+", 
         label: "Happy Photographers" 
       },
       { 
-        number: "99%", 
+        number: `${satisfactionRate}%`, 
         label: "Satisfaction Rate" 
       }
     ];

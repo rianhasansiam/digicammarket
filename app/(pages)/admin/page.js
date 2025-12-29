@@ -12,7 +12,8 @@ import {
   Shield,
   Settings,
   Mail,
-  Flame
+  Flame,
+  Image
 } from 'lucide-react';
 
 // Import admin components directly (no wrapper layers)
@@ -26,6 +27,7 @@ import AllCategoryClient from './adminComponents/allCategory/AllCategoryClient';
 import ShippingTaxSettings from './adminComponents/shippingTax/ShippingTaxSettings';
 import AllMessages from './adminComponents/allMessages/AllMessages';
 import AllSalesClient from './adminComponents/allSales/AllSalesClient';
+import HeroBannersClient from './adminComponents/heroBanners/HeroBannersClient';
 
 
 // Metadata for SEO - Admin Panel
@@ -120,6 +122,13 @@ export default function AdminPage() {
       icon: FolderOpen,
       component: AllCategoryClient,
       description: 'Product Categories'
+    },
+    {
+      id: 'banners',
+      name: 'Hero Banners',
+      icon: Image,
+      component: HeroBannersClient,
+      description: 'Homepage Banner Images'
     },
     {
       id: 'coupons',

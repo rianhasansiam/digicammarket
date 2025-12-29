@@ -1,6 +1,6 @@
 // Home page - 🚀 NEXT.JS 15 Optimized Server Component
 import { Suspense } from 'react'
-import StructuredData from './componets/StructuredData';
+import StructuredData from './componets/shared/StructuredData';
 import HomePageClient from './HomePageClient';
 import { getHomePageData } from '@/lib/data/serverDataFetchers'
 import GlobalLoadingPage from './componets/loading/GlobalLoadingPage'
@@ -68,7 +68,16 @@ export async function generateMetadata() {
 export default function Home() {
   return (
     <>
-      <StructuredData />
+      <StructuredData 
+        type="organization" 
+        data={{
+          name: 'Digicam Market',
+          url: 'https://digicammarket.com',
+          logo: 'https://digicammarket.com/logo.png',
+          description: 'Premium camera store offering quality cameras and photography equipment for everyone.',
+          phone: '+880 18704 04001'
+        }} 
+      />
       <Suspense fallback={
         <GlobalLoadingPage 
           message="Bringing Classics to Life..." 

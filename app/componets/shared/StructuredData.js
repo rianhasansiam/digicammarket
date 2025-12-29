@@ -2,11 +2,7 @@
 
 /**
  * Structured Data Component for SEO
- * Implements JSON-LD Schema.org markup for better search e          '@id': 'https://digicammarket.com',
-          name: 'Digicam Market',
-          image: 'https://digicammarket.com/logo.png',
-          '@id': 'https://digicammarket.com',
-          url: 'https://digicammarket.com', visibility
+ * Implements JSON-LD Schema.org markup for better search engine visibility
  */
 
 export default function StructuredData({ type, data }) {

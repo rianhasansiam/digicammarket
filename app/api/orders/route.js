@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { ObjectId } from 'mongodb';
 import { getCollection } from '../../../lib/mongodb';
 import { checkOrigin, isAdmin, isAuthenticated, forbiddenResponse, unauthorizedResponse } from '../../../lib/security';
 
@@ -89,7 +90,6 @@ export async function PUT(request) {
     if (!_id) {
       return NextResponse.json({ success: false, error: 'Admin order _id is required for update' }, { status: 400 });
     }
-    const { ObjectId } = (await import('mongodb'));
     const result = await adminOrders.updateOne({ _id: new ObjectId(_id) }, { $set: updateData });
     return NextResponse.json({ success: true, Data: result, message: 'Admin order updated successfully' });
   } catch (error) {
@@ -117,7 +117,6 @@ export async function DELETE(request) {
     if (!_id) {
       return NextResponse.json({ success: false, error: 'Admin order _id is required for delete' }, { status: 400 });
     }
-    const { ObjectId } = (await import('mongodb'));
     const result = await adminOrders.deleteOne({ _id: new ObjectId(_id) });
     return NextResponse.json({ success: true, Data: result, message: 'Admin order deleted successfully' });
   } catch (error) {

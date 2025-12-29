@@ -28,19 +28,24 @@ async function ensureIndexes() {
   }
 }
 
-// GET - Get all products (Public - Anyone can view)
+// GET - Get products with optional pagination (Public - Anyone can view)
 export async function GET(request) {
   try {
     // Check origin for security
     const originCheck = checkOrigin(request);
     if (originCheck) return originCheck;
 
-    // Check cache first
-    const cacheKey = 'products:all';
+    // Parse query parameters for pagination
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page')) || 0; // 0 means no pagination
+    const limit = parseInt(searchParams.get('limit')) || 12;
+    const isPaginated = page > 0;
+
+    // Determine cache key based on pagination
+    const cacheKey = isPaginated ? `products:page:${page}:${limit}` : 'products:all';
     const cachedData = apiCache.get(cacheKey, CACHE_DURATION.STATIC);
     
     if (cachedData) {
-      // Return cached data with cache headers
       return NextResponse.json(cachedData, {
         headers: {
           ...getCacheHeaders(1800), // 30 minutes
@@ -54,15 +59,51 @@ export async function GET(request) {
 
     // Get the products collection
     const products = await getCollection('allProducts');
-    
-    // Find all products with projection (only needed fields for better performance)
+
+    // If paginated request
+    if (isPaginated) {
+      const skip = (page - 1) * limit;
+      
+      // Get total count and paginated products in parallel
+      const [totalCount, paginatedProducts] = await Promise.all([
+        products.countDocuments({}),
+        products
+          .find({})
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .toArray()
+      ]);
+
+      const totalPages = Math.ceil(totalCount / limit);
+      const hasMore = page < totalPages;
+
+      const responseData = {
+        products: paginatedProducts,
+        pagination: {
+          page,
+          limit,
+          total: totalCount,
+          totalPages,
+          hasMore
+        }
+      };
+
+      // Cache paginated results
+      apiCache.set(cacheKey, responseData);
+
+      return NextResponse.json(responseData, {
+        headers: {
+          ...getCacheHeaders(1800),
+          'X-Cache': 'MISS'
+        }
+      });
+    }
+
+    // Non-paginated: Return all products (backward compatible)
     const allProducts = await products
       .find({})
-      .project({
-        // Include all fields - you can exclude large fields if not needed
-        // For example, if description is very long, you could exclude it:
-        // description: 0
-      })
+      .sort({ createdAt: -1 })
       .toArray();
 
     // Cache the results

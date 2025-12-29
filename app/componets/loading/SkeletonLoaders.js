@@ -2,12 +2,13 @@
 
 import { motion } from 'framer-motion';
 
-const ProductCardSkeleton = () => {
-  const shimmerVariants = {
-    initial: { x: '-100%' },
-    animate: { x: '100%' }
-  };
+// Shared shimmer animation variants
+const shimmerVariants = {
+  initial: { x: '-100%' },
+  animate: { x: '100%' }
+};
 
+const ProductCardSkeleton = () => {
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
       {/* Image skeleton */}
@@ -105,11 +106,6 @@ const ProductGridSkeleton = ({ count = 8 }) => {
 };
 
 const CategorySkeleton = () => {
-  const shimmerVariants = {
-    initial: { x: '-100%' },
-    animate: { x: '100%' }
-  };
-
   return (
     <div className="flex items-center space-x-4 p-4 bg-white rounded-lg">
       {/* Icon skeleton */}
@@ -175,11 +171,6 @@ const CategoriesSkeleton = ({ count = 6 }) => {
 };
 
 const TextSkeleton = ({ lines = 3, className = '' }) => {
-  const shimmerVariants = {
-    initial: { x: '-100%' },
-    animate: { x: '100%' }
-  };
-
   return (
     <div className={`space-y-3 ${className}`}>
       {Array.from({ length: lines }).map((_, index) => (

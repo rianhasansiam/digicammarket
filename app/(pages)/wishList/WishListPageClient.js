@@ -14,7 +14,7 @@ import {
   FiHeart, 
   FiShoppingCart, 
   FiStar, 
-  FiEye, 
+  FiEye,
   FiTrash2,
   FiGrid,
   FiList,
@@ -27,7 +27,6 @@ import {
 // Wishlist Product Card Component
 const WishlistProductCard = ({ product, onRemove, onAddToCart, isSelected, onSelect }) => {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
 
   const discount = product.originalPrice 
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-export function middleware(request) {
+export function proxy(request) {
   // Get the pathname of the request
   const path = request.nextUrl.pathname;
 
@@ -57,7 +57,7 @@ export function middleware(request) {
   return NextResponse.next();
 }
 
-// Configure which paths should be handled by middleware
+// Configure which paths should be handled by proxy
 export const config = {
   matcher: '/api/:path*',
 };

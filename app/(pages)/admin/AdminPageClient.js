@@ -20,7 +20,8 @@ import {
   Search,
   Shield,
   Mail,
-  Flame
+  Flame,
+  Image
 } from 'lucide-react';
 import LoadingSpinner from '../../componets/loading/LoadingSpinner';
 
@@ -65,6 +66,10 @@ const AllSalesClient = dynamic(() => import('./adminComponents/allSales/AllSales
   loading: () => <LoadingSpinner message="Loading Sales..." />
 });
 
+const HeroBannersClient = dynamic(() => import('./adminComponents/heroBanners/HeroBannersClient'), {
+  loading: () => <LoadingSpinner message="Loading Banners..." />
+});
+
 
 const AdminPageClient = ({ adminData, navigationItems }) => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -99,6 +104,7 @@ const AdminPageClient = ({ adminData, navigationItems }) => {
     'orders': ShoppingCart,
     'reviews': Star,
     'categories': FolderOpen,
+    'banners': Image,
     'coupons': Ticket,
     'sales': Flame,
     'shipping-tax': Settings,
@@ -113,6 +119,7 @@ const AdminPageClient = ({ adminData, navigationItems }) => {
     'orders': OrderDetails,
     'reviews': AllReviews,
     'categories': AllCategoryClient,
+    'banners': HeroBannersClient,
     'coupons': AllCuponsClient,
     'sales': AllSalesClient,
     'shipping-tax': ShippingTaxSettings,

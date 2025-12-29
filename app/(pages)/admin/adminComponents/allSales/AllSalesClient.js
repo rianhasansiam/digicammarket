@@ -52,17 +52,29 @@ const AllSalesClient = () => {
 
   const { addData, isLoading: isAdding } = useAddData({
     name: 'sales',
-    api: '/api/sales'
+    api: '/api/sales',
+    onSuccess: () => {
+      // Refetch Redux sales cache after successful add
+      refetch();
+    }
   });
 
   const { updateData, isLoading: isUpdating } = useUpdateData({
     name: 'sales',
-    api: '/api/sales'
+    api: '/api/sales',
+    onSuccess: () => {
+      // Refetch Redux sales cache after successful update
+      refetch();
+    }
   });
 
   const { deleteData, isLoading: isDeleting } = useDeleteData({
     name: 'sales',
-    api: '/api/sales'
+    api: '/api/sales',
+    onSuccess: () => {
+      // Refetch Redux sales cache after successful delete
+      refetch();
+    }
   });
 
   // Filter sales based on search term, status, and type

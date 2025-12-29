@@ -1,46 +1,39 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { FiSliders, FiX } from "react-icons/fi";
 import { Search } from "lucide-react";
 import CardsClient from "../../componets/cards/CardsClient";
 import { FilterProvider, useFilterState, useFilterActions, useFilteredProducts } from "./context/FilterContext";
 import SearchBar from "./components/SearchBar";
 import EnhancedFilters from "./components/EnhancedFilters";
-import Pagination from "./Pagination";
+import InfiniteScrollLoader from "./components/InfiniteScrollLoader";
+import { useClientInfiniteScroll } from "../../../lib/hooks/useInfiniteScroll";
 
 // Inner component that uses filter context
 const ProductsContent = ({ productsData, categoriesData }) => {
   const filters = useFilterState();
   const { setSortBy } = useFilterActions();
   const processedProducts = useFilteredProducts(productsData);
-  const [currentPage, setCurrentPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const productsPerPage = 8;
+  const productsPerPage = 12;
   
-  // Pagination calculations (filtering and sorting is now handled by useFilteredProducts)
-  const { totalPages, startIndex, endIndex, currentProducts } = useMemo(() => {
-    const total = Math.ceil(processedProducts.length / productsPerPage);
-    const start = (currentPage - 1) * productsPerPage;
-    const end = start + productsPerPage;
-    const products = processedProducts.slice(start, end);
-    
-    return {
-      totalPages: total,
-      startIndex: start,
-      endIndex: end,
-      currentProducts: products
-    };
-  }, [processedProducts, currentPage, productsPerPage]);
-
-  const handlePageChange = useCallback((page) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  // Use infinite scroll instead of pagination
+  const {
+    visibleItems: currentProducts,
+    loading,
+    hasMore,
+    totalCount,
+    displayCount,
+    loadMore,
+    loadMoreRef
+  } = useClientInfiniteScroll({
+    allItems: processedProducts,
+    itemsPerPage: productsPerPage
+  });
 
   const handleSortChange = useCallback((value) => {
     setSortBy(value);
-    setCurrentPage(1);
   }, [setSortBy]);
 
   return (
@@ -107,7 +100,7 @@ const ProductsContent = ({ productsData, categoriesData }) => {
                 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                   <span className="text-xs sm:text-sm text-gray-600">
-                    Showing {processedProducts.length > 0 ? startIndex + 1 : 0}-{Math.min(endIndex, processedProducts.length)} of {processedProducts.length} products
+                    Showing {displayCount} of {totalCount} products
                   </span>
                   <div className="flex items-center gap-2">
                     <label htmlFor="sort" className="text-sm text-gray-700 hidden sm:block">Sort by:</label>
@@ -117,10 +110,10 @@ const ProductsContent = ({ productsData, categoriesData }) => {
                       onChange={(e) => handleSortChange(e.target.value)}
                       className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent min-w-[140px]"
                     >
+                      <option value="newest">Newest First</option>
                       <option value="most-popular">Most Popular</option>
                       <option value="low-price">Price: Low to High</option>
                       <option value="high-price">Price: High to Low</option>
-                      <option value="newest">Newest First</option>
                     </select>
                   </div>
                 </div>
@@ -145,13 +138,18 @@ const ProductsContent = ({ productsData, categoriesData }) => {
                 )}
               </div>
 
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="pt-8 border-t border-gray-200">
-                  <Pagination 
-                    currentPage={currentPage} 
-                    totalPages={totalPages} 
-                    onPageChange={handlePageChange} 
+              {/* Infinite Scroll Loader */}
+              {totalCount > 0 && (
+                <div className="pt-4">
+                  <InfiniteScrollLoader
+                    ref={loadMoreRef}
+                    loading={loading}
+                    hasMore={hasMore}
+                    totalCount={totalCount}
+                    displayCount={displayCount}
+                    onLoadMore={loadMore}
+                    loadingText="Loading more products..."
+                    endText="You've seen all products"
                   />
                 </div>
               )}

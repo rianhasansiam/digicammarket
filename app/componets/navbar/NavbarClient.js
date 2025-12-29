@@ -91,7 +91,7 @@ const NavbarClient = ({ navItems, defaultShopCategories }) => {
     }
     
     return categories.slice(0, 6); // Maximum 6 items in dropdown
-  }, [categoriesData, productsData, defaultShopCategories, getCategoryIcon]);
+  }, [categoriesData, productsData, defaultShopCategories]);
 
   // Helper function to check if user is admin
   const isAdmin = useCallback(() => {

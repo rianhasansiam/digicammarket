@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useInView } from 'framer-motion';
-import { Camera, Aperture, Eye, Award, Globe, Sparkles, Linkedin, Instagram, Twitter, ArrowRight, ExternalLink, Calendar, Trophy, ShieldCheck, Users, Zap } from 'lucide-react';
+import { Camera, Aperture, Eye, Award, Globe, Sparkles, Calendar, Trophy, ShieldCheck, Users, Zap, ArrowRight } from 'lucide-react';
 import { useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -17,9 +17,6 @@ const AboutPageClient = ({ aboutData }) => {
       Award,
       Globe,
       Sparkles,
-      Linkedin,
-      Instagram,
-      Twitter,
       Calendar,
       Trophy,
       ShieldCheck,

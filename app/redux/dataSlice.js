@@ -7,7 +7,8 @@ const isDev = process.env.NODE_ENV === 'development';
 const CACHE_DURATION = {
   STATIC: 60 * 60 * 1000,      // 1 hour for static data (products, categories)
   DYNAMIC: 10 * 60 * 1000,     // 10 minutes for dynamic data (reviews, coupons)
-  USER_SPECIFIC: 5 * 60 * 1000 // 5 minutes for user-specific data (orders)
+  USER_SPECIFIC: 5 * 60 * 1000, // 5 minutes for user-specific data (orders)
+  NO_CACHE: 0                   // Always fetch fresh (sales, promotions)
 };
 
 // Initial state with all data entities
@@ -93,13 +94,22 @@ const initialState = {
     cacheType: 'DYNAMIC'
   },
 
-  // Sales (Flash Sales, Bundle Sales, etc.)
+  // Sales (Flash Sales, Bundle Sales, etc.) - NO_CACHE for instant updates
   sales: {
     data: [],
     isLoading: false,
     error: null,
     lastFetched: null,
-    cacheType: 'DYNAMIC'
+    cacheType: 'NO_CACHE'
+  },
+
+  // Hero Banners - STATIC cache for banner images
+  banners: {
+    data: [],
+    isLoading: false,
+    error: null,
+    lastFetched: null,
+    cacheType: 'STATIC'
   },
 
   // Global fetch status
@@ -305,20 +315,34 @@ export const fetchBusinessTracking = createAsyncThunk(
   }
 );
 
-// Fetch Sales
+// Fetch Sales - NO CACHE, always fetch fresh
 export const fetchSales = createAsyncThunk(
   'data/fetchSales',
+  async ({ activeOnly = false } = {}, { rejectWithValue }) => {
+    try {
+      const url = activeOnly ? '/api/sales?active=true' : '/api/sales';
+      const response = await axios.get(url);
+      return { data: response.data, fromCache: false, isFiltered: activeOnly };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+// Fetch Banners
+export const fetchBanners = createAsyncThunk(
+  'data/fetchBanners',
   async ({ activeOnly = false } = {}, { getState, rejectWithValue }) => {
     const { data: dataState } = getState();
-    const { sales } = dataState;
+    const { banners } = dataState;
     
-    // For all sales without filters, use cache
-    if (!activeOnly && sales.data.length > 0 && isCacheValid(sales.lastFetched, sales.cacheType)) {
-      return { data: sales.data, fromCache: true };
+    // For all banners without activeOnly filter, use cache
+    if (!activeOnly && banners.data.length > 0 && isCacheValid(banners.lastFetched, banners.cacheType)) {
+      return { data: banners.data, fromCache: true };
     }
     
     try {
-      const url = activeOnly ? '/api/sales?active=true' : '/api/sales';
+      const url = activeOnly ? '/api/banners?active=true' : '/api/banners';
       const response = await axios.get(url);
       return { data: response.data, fromCache: false, isFiltered: activeOnly };
     } catch (error) {
@@ -520,6 +544,27 @@ export const dataSlice = createSlice({
       const saleId = action.payload;
       state.sales.data = state.sales.data.filter(s => 
         s._id !== saleId && s.id !== saleId
+      );
+    },
+
+    // Update a single banner
+    updateBanner: (state, action) => {
+      const updatedBanner = action.payload;
+      const index = state.banners.data.findIndex(b => 
+        b._id === updatedBanner._id || b.id === updatedBanner.id
+      );
+      if (index !== -1) {
+        state.banners.data[index] = updatedBanner;
+      } else {
+        state.banners.data.push(updatedBanner);
+      }
+    },
+    
+    // Remove a banner
+    removeBanner: (state, action) => {
+      const bannerId = action.payload;
+      state.banners.data = state.banners.data.filter(b => 
+        b._id !== bannerId && b.id !== bannerId
       );
     },
 
@@ -742,6 +787,24 @@ export const dataSlice = createSlice({
         state.sales.isLoading = false;
         state.sales.error = action.payload;
       })
+
+    // Banners
+    builder
+      .addCase(fetchBanners.pending, (state) => {
+        state.banners.isLoading = true;
+        state.banners.error = null;
+      })
+      .addCase(fetchBanners.fulfilled, (state, action) => {
+        state.banners.isLoading = false;
+        if (!action.payload.fromCache && !action.payload.isFiltered) {
+          state.banners.data = action.payload.data;
+          state.banners.lastFetched = Date.now();
+        }
+      })
+      .addCase(fetchBanners.rejected, (state, action) => {
+        state.banners.isLoading = false;
+        state.banners.error = action.payload;
+      })
     
     // Initial Data Load
     builder
@@ -776,6 +839,8 @@ export const {
   removeCoupon,
   updateSale,
   removeSale,
+  updateBanner,
+  removeBanner,
   updateShippingTaxSettings,
   setProductsData,
   setCategoriesData,
@@ -794,6 +859,7 @@ export const selectContacts = (state) => state.data.contacts;
 export const selectShippingTaxSettings = (state) => state.data.shippingTaxSettings;
 export const selectBusinessTracking = (state) => state.data.businessTracking;
 export const selectSales = (state) => state.data.sales;
+export const selectBanners = (state) => state.data.banners;
 export const selectGlobalLoading = (state) => state.data.globalLoading;
 export const selectInitialDataLoaded = (state) => state.data.initialDataLoaded;
 

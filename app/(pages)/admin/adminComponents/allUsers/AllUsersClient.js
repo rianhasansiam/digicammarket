@@ -21,7 +21,6 @@ import {
   AlertTriangle,
   Loader2
 } from 'lucide-react';
-import { useGetData } from '@/lib/hooks/useGetData';
 import { useDeleteData } from '@/lib/hooks/useDeleteData';
 
 const AllUsersClient = ({ users: userData = [], orders: ordersDataProp = [], isLoading: isLoadingProp = false }) => {
