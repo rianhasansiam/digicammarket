@@ -7,7 +7,6 @@ import ErrorBoundary from "./componets/shared/ErrorBoundary";
 import ErrorSuppression from "./componets/shared/ErrorSuppression";
 import AuthProvider from "../lib/AuthProvider";
 import ReactQueryProvider from "@/lib/ReactQueryProvider";
-import { LoadingProvider } from "../lib/LoadingProvider";
 import SkipNavigation from "./componets/shared/SkipNavigation";
 import DataInitializer from "./componets/shared/DataInitializer";
 
@@ -67,7 +66,6 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <StoreProvider>
             <ReactQueryProvider>
-              <LoadingProvider>
                 <DataInitializer>
                   <SkipNavigation />
                   <div className="flex flex-col min-h-screen bg-white text-black">
@@ -78,7 +76,6 @@ export default function RootLayout({ children }) {
                     <Footer />
                   </div>
                 </DataInitializer>
-              </LoadingProvider>
             </ReactQueryProvider>
           </StoreProvider>
         </AuthProvider>

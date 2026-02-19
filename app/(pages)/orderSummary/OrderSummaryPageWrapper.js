@@ -11,7 +11,22 @@ export default function OrderSummaryPageWrapper() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Get order data from URL params
+    // Try loading order data from sessionStorage first (secure method)
+    if (typeof window !== 'undefined') {
+      try {
+        const storedOrder = sessionStorage.getItem('lastOrderData');
+        if (storedOrder) {
+          const parsedOrderData = JSON.parse(storedOrder);
+          setOrderData(parsedOrderData);
+          setIsLoading(false);
+          return;
+        }
+      } catch (error) {
+        console.error('Error loading order from sessionStorage:', error);
+      }
+    }
+
+    // Fallback: Get order data from URL params (backwards compatibility)
     const orderDataParam = searchParams.get('orderData');
     
     if (orderDataParam) {

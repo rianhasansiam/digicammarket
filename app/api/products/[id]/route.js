@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getCollection } from '../../../../lib/mongodb';
 import { checkOrigin, isAdmin, forbiddenResponse } from '../../../../lib/security';
-import apiCache, { getCacheHeaders, CACHE_DURATION } from '../../../../lib/cache/apiCache';
+import apiCache, { getCacheHeaders } from '../../../../lib/cache/apiCache';
+import { revalidateTag } from 'next/cache';
 
 // PUT - Update product by ID (Admin only)
 export async function PUT(request, { params }) {
@@ -72,9 +73,10 @@ export async function PUT(request, { params }) {
       }, { status: 404 });
     }
 
-    // Invalidate cache for this product and all products
+    // Invalidate cache for this product and all products (on-demand)
     apiCache.invalidate(`product:${id}`);
     apiCache.invalidateByPattern('products');
+    revalidateTag('products');
 
     return NextResponse.json({ 
       success: true, 
@@ -125,9 +127,10 @@ export async function DELETE(request, { params }) {
       }, { status: 404 });
     }
 
-    // Invalidate cache for this product and all products
+    // Invalidate cache for this product and all products (on-demand)
     apiCache.invalidate(`product:${id}`);
     apiCache.invalidateByPattern('products');
+    revalidateTag('products');
 
     return NextResponse.json({ 
       success: true, 
@@ -162,14 +165,14 @@ export async function GET(request, { params }) {
       }, { status: 400 });
     }
 
-    // Check cache first
+    // Check cache first (on-demand invalidation only)
     const cacheKey = `product:${id}`;
-    const cachedProduct = apiCache.get(cacheKey, CACHE_DURATION.STATIC);
+    const cachedProduct = apiCache.get(cacheKey);
     
     if (cachedProduct) {
       return NextResponse.json(cachedProduct, {
         headers: {
-          ...getCacheHeaders(1800), // 30 minutes
+          ...getCacheHeaders(),
           'X-Cache': 'HIT'
         }
       });
@@ -190,7 +193,7 @@ export async function GET(request, { params }) {
 
     return NextResponse.json(product, {
       headers: {
-        ...getCacheHeaders(1800), // 30 minutes
+        ...getCacheHeaders(),
         'X-Cache': 'MISS'
       }
     });

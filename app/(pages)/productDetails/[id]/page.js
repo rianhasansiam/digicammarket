@@ -262,12 +262,14 @@ export default function ProductDetailPage({ params }) {
   };
 
   // Set default selections when product loads
-  if (product && !selectedColor && product.colors?.length > 0) {
-    setSelectedColor(product.colors[0]);
-  }
-  if (product && !selectedSize && product.sizes?.length > 0) {
-    setSelectedSize(product.sizes[0]);
-  }
+  useEffect(() => {
+    if (product && !selectedColor && product.colors?.length > 0) {
+      setSelectedColor(product.colors[0]);
+    }
+    if (product && !selectedSize && product.sizes?.length > 0) {
+      setSelectedSize(product.sizes[0]);
+    }
+  }, [product, selectedColor, selectedSize]);
 
   // Handle loading state
   if (isLoading) {

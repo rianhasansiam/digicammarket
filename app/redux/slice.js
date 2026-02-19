@@ -123,11 +123,11 @@ export const userSlice = createSlice({
             name: product.name,
             brand: product.brand || '',
             price: product.price,
-            image: product.imageUrl,
+            image: product.image || product.images?.[0] || product.imageUrl,
             quantity,
             size,
             color,
-            stock: product.stockCount || 10
+            stock: product.stock ?? product.stockCount ?? 10
           };
         } else {
           // New format (from wishlist and other components)
@@ -236,6 +236,9 @@ export const userSlice = createSlice({
       state.cart.items = [];
       state.cart.totalQuantity = 0;
       state.cart.totalAmount = 0;
+      
+      // Cancel any pending debounced save that could restore cart
+      clearTimeout(saveCartTimeout);
       
       // Clear localStorage immediately for cart clearing
       if (typeof window !== 'undefined') {

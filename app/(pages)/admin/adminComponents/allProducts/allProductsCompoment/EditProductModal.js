@@ -31,16 +31,9 @@ const EditProductModal = ({ isOpen, onClose, categories, product }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [availableSizes] = useState(['Used', 'Used Like New', 'New']);
   const [availableStyles] = useState(['Digital Cameras', 'Handycams / Camcorders', 'Film Cameras', 'Bridge Cameras', 'DSLR Cameras', 'Mirrorless Cameras', 'Action Cameras','Instant Cameras','Disposable Cameras','Accessories (Batteries, Chargers, SD Cards, etc.)']);
-  const [availableColors] = useState([
-    { name: 'Black', value: 'Black', bg: 'bg-black', border: 'border-black' },
-    { name: 'Silver', value: 'Silver', bg: 'bg-gray-300', border: 'border-gray-300' },
-    { name: 'Gray', value: 'Gray', bg: 'bg-gray-500', border: 'border-gray-500' },
-    { name: 'White', value: 'White', bg: 'bg-white', border: 'border-gray-300' },
-    { name: 'Gold', value: 'Gold', bg: 'bg-yellow-600', border: 'border-yellow-600' },
-    { name: 'Blue', value: 'Blue', bg: 'bg-blue-500', border: 'border-blue-500' },
-    { name: 'Red', value: 'Red', bg: 'bg-red-500', border: 'border-red-500' },
-    { name: 'Bronze', value: 'Bronze', bg: 'bg-amber-700', border: 'border-amber-700' }
-  ]);
+  const [colorInput, setColorInput] = useState('');
+  const [colorPickerValue, setColorPickerValue] = useState('#000000');
+  const colorSuggestions = ['Black', 'Silver', 'Gray', 'White', 'Gold', 'Blue', 'Red', 'Bronze', 'Green', 'Brown', 'Pink', 'Purple', 'Orange', 'Yellow', 'Navy', 'Champagne', 'Titanium', 'Graphite'];
   const fileInputRef = useRef(null);
   
   // Initialize the useUpdateData hook
@@ -191,21 +184,38 @@ const EditProductModal = ({ isOpen, onClose, categories, product }) => {
     }
   };
 
-  // Handle color selection
-  const handleColorToggle = (color) => {
-    setFormData(prev => ({
-      ...prev,
-      colors: prev.colors.includes(color)
-        ? prev.colors.filter(c => c !== color)
-        : [...prev.colors, color]
-    }));
-    
+  // Handle adding a color
+  const handleAddColor = (colorName) => {
+    const trimmed = colorName.trim();
+    if (!trimmed) return;
+    const formatted = trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+    if (formData.colors.includes(formatted)) return;
+    setFormData(prev => ({ ...prev, colors: [...prev.colors, formatted] }));
+    setColorInput('');
     if (formErrors.colors) {
-      setFormErrors(prev => {
-        const newErrors = {...prev};
-        delete newErrors.colors;
-        return newErrors;
-      });
+      setFormErrors(prev => { const n = {...prev}; delete n.colors; return n; });
+    }
+  };
+
+  // Handle removing a color
+  const handleRemoveColor = (color) => {
+    setFormData(prev => ({ ...prev, colors: prev.colors.filter(c => c !== color) }));
+  };
+
+  // Handle color input key press
+  const handleColorKeyDown = (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); handleAddColor(colorInput); }
+  };
+
+  // Handle color picker
+  const handleColorPicker = (e) => {
+    setColorPickerValue(e.target.value);
+  };
+
+  const handleColorPickerAdd = () => {
+    const hex = colorPickerValue.toUpperCase();
+    if (!formData.colors.includes(hex)) {
+      handleAddColor(hex);
     }
   };
 
@@ -630,23 +640,64 @@ const EditProductModal = ({ isOpen, onClose, categories, product }) => {
                   <Palette className="inline mr-2" size={16} />
                   Body Color *
                 </label>
-                <div className="grid grid-cols-5 gap-3">
-                  {availableColors.map((color) => (
+
+                {/* Selected colors */}
+                {formData.colors.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {formData.colors.map((color) => (
+                      <span
+                        key={color}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-gray-100 border border-gray-300 text-sm font-medium text-gray-700"
+                      >
+                        {color.startsWith('#') && (
+                          <span className="w-3 h-3 rounded-full border border-gray-300" style={{ backgroundColor: color }} />
+                        )}
+                        {color}
+                        <button type="button" onClick={() => handleRemoveColor(color)} className="ml-1 text-gray-400 hover:text-red-500 transition-colors">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Color input + picker */}
+                <div className="flex gap-2 mb-3">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      value={colorInput}
+                      onChange={(e) => setColorInput(e.target.value)}
+                      onKeyDown={handleColorKeyDown}
+                      placeholder="Type a color name and press Enter..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                    />
+                  </div>
+                  <button type="button" onClick={() => handleAddColor(colorInput)} disabled={!colorInput.trim()} className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                    <Plus className="w-4 h-4" />
+                  </button>
+                  <div className="flex items-center gap-1">
+                    <input type="color" value={colorPickerValue} onChange={handleColorPicker} className="w-9 h-9 rounded-lg border border-gray-300 cursor-pointer p-0.5" title="Pick a color" />
+                    <button type="button" onClick={handleColorPickerAdd} className="px-3 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Quick suggestions */}
+                <div className="flex flex-wrap gap-2">
+                  {colorSuggestions.filter(c => !formData.colors.includes(c)).slice(0, 12).map((color) => (
                     <button
-                      key={color.value}
+                      key={color}
                       type="button"
-                      onClick={() => handleColorToggle(color.value)}
-                      className={`flex items-center gap-2 p-3 border rounded-lg transition-all ${
-                        formData.colors.includes(color.value)
-                          ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
+                      onClick={() => handleAddColor(color)}
+                      className="px-2.5 py-1 rounded-md border border-gray-200 text-xs font-medium text-gray-600 hover:border-gray-400 hover:bg-gray-50 transition-all"
                     >
-                      <div className={`w-4 h-4 rounded-full ${color.bg} border ${color.border}`}></div>
-                      <span className="text-sm font-medium">{color.name}</span>
+                      + {color}
                     </button>
                   ))}
                 </div>
+
                 {formErrors.colors && (
                   <p className="text-red-500 text-sm mt-2 flex items-center gap-1">
                     <AlertCircle size={14} />

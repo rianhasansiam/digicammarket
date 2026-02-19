@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server';
 import { getCollection } from '../../../lib/mongodb';
 import { checkOrigin, isAdmin, forbiddenResponse } from '../../../lib/security';
+import { revalidateTag } from 'next/cache';
 
 
 
@@ -45,6 +46,9 @@ export async function POST(request) {
 
     const userData = await users.insertOne(userToInsert);
 
+    // On-demand revalidation
+    revalidateTag('users');
+
     return NextResponse.json({
       success: true,
       Data: userData,
@@ -86,14 +90,16 @@ export async function PUT(request) {
       );
     }
 
-    // Support both plain text and bcryptjs-hashed passwords
+    // Verify password using bcrypt only (no plain text comparison)
     let passwordMatch = false;
-    if (user.password.startsWith('$2a$') || user.password.startsWith('$2b$') || user.password.startsWith('$2y$')) {
-      // bcryptjs hash
+    if (user.password && (user.password.startsWith('$2a$') || user.password.startsWith('$2b$') || user.password.startsWith('$2y$'))) {
       passwordMatch = await bcrypt.compare(password, user.password);
     } else {
-      // plain text
-      passwordMatch = user.password === password;
+      // Reject login if password is not properly hashed
+      return NextResponse.json(
+        { success: false, message: 'Account requires password reset. Please contact support.' },
+        { status: 401 }
+      );
     }
     if (!passwordMatch) {
       return NextResponse.json(
@@ -130,17 +136,32 @@ export async function GET(request) {
     // Check if user is admin for fetching all users
     const admin = await isAdmin();
     
-    // Development logging
-    if (process.env.NODE_ENV === 'development') {
-      const user = await import('../../../lib/auth').then(m => m.auth()).then(s => s?.user);
-      console.log('🔍 GET /api/users - User:', user?.email, 'Role:', user?.role, 'IsAdmin:', admin);
-    }
-    
-    // TEMPORARY: Allow in development if authenticated
-    const isAuthenticated = await import('../../../lib/security').then(m => m.isAuthenticated());
-    if (process.env.NODE_ENV === 'development' && isAuthenticated) {
-      console.log('⚠️ Development mode: Allowing authenticated user access to /api/users');
-    } else if (!admin) {
+    if (!admin) {
+      // Allow authenticated users to look up their own email only
+      const isAuth = await import('../../../lib/security').then(m => m.isAuthenticated());
+      const { searchParams } = new URL(request.url);
+      const email = searchParams.get('email');
+      
+      if (isAuth && email) {
+        // Non-admin authenticated users can only look up by email
+        const users = await getCollection('users');
+        const user = await users.findOne({ email: email });
+        
+        if (user) {
+          const { password: _, ...userData } = user;
+          return NextResponse.json({
+            success: true,
+            user: userData,
+            message: 'User found.'
+          });
+        } else {
+          return NextResponse.json({
+            success: false,
+            message: 'User not found.'
+          }, { status: 404 });
+        }
+      }
+      
       return forbiddenResponse('Only admins can view users list. Please log in as admin.');
     }
 
@@ -168,9 +189,10 @@ export async function GET(request) {
       }
     }
 
-    // Otherwise, fetch all users
+    // Otherwise, fetch all users (strip passwords)
     const allUsers = await users.find({}).toArray();
-    return NextResponse.json(allUsers);
+    const safeUsers = allUsers.map(({ password, ...rest }) => rest);
+    return NextResponse.json(safeUsers);
   } catch (error) {
     console.error('Error fetching users:', error);
     return NextResponse.json(
@@ -199,7 +221,7 @@ export async function DELETE(request) {
       return forbiddenResponse('Only admins can delete users');
     }
 
-    const adminUsers = await getCollection('adminUsers');
+    const adminUsers = await getCollection('users');
     const body = await request.json();
     const { _id } = body;
     if (!_id) {
@@ -207,6 +229,10 @@ export async function DELETE(request) {
     }
     const { ObjectId } = (await import('mongodb'));
     const result = await adminUsers.deleteOne({ _id: new ObjectId(_id) });
+
+    // On-demand revalidation
+    revalidateTag('users');
+
     return NextResponse.json({ success: true, Data: result, message: 'Admin user deleted successfully' });
   } catch (error) {
     console.error('Error deleting admin user:', error);

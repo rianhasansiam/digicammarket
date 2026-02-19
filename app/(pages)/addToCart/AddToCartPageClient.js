@@ -13,7 +13,7 @@ import { PLACEHOLDER_IMAGES } from '@/lib/constants';
 const AddToCartPageClient = ({ productsData, couponsData }) => {
   // Redux state
   const dispatch = useAppDispatch();
-  const cartItems = useAppSelector((state) => state.user.cart.items) || [];
+  const cartItems = useAppSelector((state) => state.user.cart.items, []);
   
   // Merge cart items with fresh product data to fix undefined values
   const enrichedCartItems = cartItems.map(cartItem => {
@@ -66,6 +66,17 @@ const AddToCartPageClient = ({ productsData, couponsData }) => {
   // Load cart from localStorage when component mounts
   useEffect(() => {
     dispatch(loadCartFromStorage());
+    // Restore persisted coupon from sessionStorage
+    if (typeof window !== 'undefined') {
+      try {
+        const savedCoupon = sessionStorage.getItem('appliedCoupon');
+        if (savedCoupon) {
+          setAppliedCoupon(JSON.parse(savedCoupon));
+        }
+      } catch (e) {
+        console.error('Error loading saved coupon:', e);
+      }
+    }
   }, [dispatch]);
 
   // Simple helper to get current product stock
@@ -124,6 +135,10 @@ const AddToCartPageClient = ({ productsData, couponsData }) => {
     setAppliedCoupon(coupon);
     setCouponCode('');
     setCouponError('');
+    // Persist applied coupon to sessionStorage for checkout page
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('appliedCoupon', JSON.stringify(coupon));
+    }
   };
 
   // Remove coupon
@@ -131,6 +146,10 @@ const AddToCartPageClient = ({ productsData, couponsData }) => {
     setAppliedCoupon(null);
     setCouponCode('');
     setCouponError('');
+    // Clear persisted coupon from sessionStorage
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('appliedCoupon');
+    }
   };
 
   // Calculate totals with coupon and dynamic shipping/tax

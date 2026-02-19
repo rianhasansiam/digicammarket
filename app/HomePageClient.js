@@ -1,7 +1,7 @@
 'use client';
 
 import { useProducts, useCategories, useReviews, useUsers, useSales } from '@/lib/hooks/useReduxData';
-import GlobalLoadingPage from './componets/loading/GlobalLoadingPage';
+import LoadingSpinner from './componets/loading/LoadingSpinner';
 import Hero from './componets/hero/Hero';
 import Category from './componets/category/Category';
 import FeaturedProducts from './componets/featuredProducts/FeaturedProducts';
@@ -25,10 +25,10 @@ export default function HomePageClient() {
   // Keep showing loading until ALL data is ready (not just checking if data exists)
   if (isLoading && !productsData?.length && !categoriesData?.length) {
     return (
-      <GlobalLoadingPage 
-        message="Bringing Classics to Life..." 
-        showLogo={true}
-      />
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <LoadingSpinner size="lg" color="black" />
+        <p className="mt-4 text-gray-500">Bringing Classics to Life...</p>
+      </div>
     );
   }
 

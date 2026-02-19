@@ -16,11 +16,8 @@ export default function AllProductsPageClient() {
   if (pageLoading && !productsData?.length && !categoriesData?.length) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
-        <div className="text-black text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-2 sm:mb-4">Digicam Market</h1>
-          <p className="text-base sm:text-lg md:text-xl mb-4 sm:mb-6">Loading products...</p>
-        </div>
         <LoadingSpinner size="lg" color="black" />
+        <p className="mt-4 text-gray-500">Loading products...</p>
       </div>
     );
   }

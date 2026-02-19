@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCollection } from '../../../lib/mongodb';
 import { checkOrigin, isAdmin, forbiddenResponse } from '../../../lib/security';
+import { revalidateTag } from 'next/cache';
 
 // GET - Get all banners (Public - Anyone can view active banners)
 export async function GET(request) {
@@ -79,6 +80,7 @@ export async function POST(request) {
     
     const result = await banners.insertOne(bannerData);
 
+    revalidateTag('banners');
     return NextResponse.json({
       success: true,
       data: { ...bannerData, _id: result.insertedId },
@@ -136,6 +138,7 @@ export async function PUT(request) {
       }, { status: 404 });
     }
 
+    revalidateTag('banners');
     return NextResponse.json({
       success: true,
       message: "Banner updated successfully"
@@ -185,6 +188,7 @@ export async function DELETE(request) {
       }, { status: 404 });
     }
 
+    revalidateTag('banners');
     return NextResponse.json({
       success: true,
       message: "Banner deleted successfully"

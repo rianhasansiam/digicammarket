@@ -73,8 +73,8 @@ const ProductCard = memo(({
   const router = useRouter();
   
   // Get current cart and wishlist state from Redux
-  const cartItems = useAppSelector((state) => state.user.cart.items);
-  const wishlistItems = useAppSelector((state) => state.user.wishlist.items);
+  const cartItems = useAppSelector((state) => state.user.cart.items, []);
+  const wishlistItems = useAppSelector((state) => state.user.wishlist.items, []);
   
   // Check if product is already in cart or wishlist - memoized for performance
   const productId = product.id || product._id;

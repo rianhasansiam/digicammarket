@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCollection } from '../../../lib/mongodb';
 import { checkOrigin, isAdmin, forbiddenResponse } from '../../../lib/security';
+import { revalidateTag } from 'next/cache';
 
 // GET - Get all sales (public for active sales, admin for all)
 export async function GET(request) {
@@ -108,6 +109,7 @@ export async function POST(request) {
     // Insert the new sale
     const result = await sales.insertOne(saleData);
 
+    revalidateTag('sales');
     return NextResponse.json({
       success: true,
       data: { ...saleData, _id: result.insertedId },

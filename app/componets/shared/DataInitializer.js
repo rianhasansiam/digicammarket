@@ -38,21 +38,3 @@ export default function DataInitializer({ children }) {
   
   return children;
 }
-
-/**
- * Hook to check if initial data is ready
- * Use this in components that need to wait for initial data
- */
-export const useDataReady = () => {
-  const products = useAppSelector(selectProducts);
-  const categories = useAppSelector(selectCategories);
-  const globalLoading = useAppSelector(selectGlobalLoading);
-  const initialDataLoaded = useAppSelector(selectInitialDataLoaded);
-  
-  return {
-    isReady: initialDataLoaded || (products.data.length > 0 && categories.data.length > 0),
-    isLoading: globalLoading || products.isLoading || categories.isLoading,
-    hasProducts: products.data.length > 0,
-    hasCategories: categories.data.length > 0
-  };
-};

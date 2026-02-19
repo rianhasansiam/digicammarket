@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getCollection } from '../../../lib/mongodb';
 import { checkOrigin, isAdmin, forbiddenResponse } from '../../../lib/security';
-import apiCache, { CACHE_DURATION, getCacheHeaders } from '../../../lib/cache/apiCache';
+import apiCache, { getCacheHeaders } from '../../../lib/cache/apiCache';
+import { revalidateTag } from 'next/cache';
 
 // Ensure database indexes for better query performance
 let indexesCreated = false;
@@ -43,12 +44,12 @@ export async function GET(request) {
 
     // Determine cache key based on pagination
     const cacheKey = isPaginated ? `products:page:${page}:${limit}` : 'products:all';
-    const cachedData = apiCache.get(cacheKey, CACHE_DURATION.STATIC);
+    const cachedData = apiCache.get(cacheKey);
     
     if (cachedData) {
       return NextResponse.json(cachedData, {
         headers: {
-          ...getCacheHeaders(1800), // 30 minutes
+          ...getCacheHeaders(),
           'X-Cache': 'HIT'
         }
       });
@@ -94,7 +95,7 @@ export async function GET(request) {
 
       return NextResponse.json(responseData, {
         headers: {
-          ...getCacheHeaders(1800),
+          ...getCacheHeaders(),
           'X-Cache': 'MISS'
         }
       });
@@ -111,7 +112,7 @@ export async function GET(request) {
 
     return NextResponse.json(allProducts, {
       headers: {
-        ...getCacheHeaders(1800), // 30 minutes
+        ...getCacheHeaders(),
         'X-Cache': 'MISS'
       }
     });
@@ -199,8 +200,9 @@ export async function POST(request) {
     // Insert the new product
     const result = await products.insertOne(productData);
 
-    // Invalidate products cache
+    // Invalidate products cache (on-demand)
     apiCache.invalidateByPattern('products');
+    revalidateTag('products');
 
     return NextResponse.json({
       success: true,

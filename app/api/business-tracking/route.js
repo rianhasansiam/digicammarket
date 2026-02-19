@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getCollection } from '../../../lib/mongodb';
 import { checkOrigin, isAdmin, forbiddenResponse, unauthorizedResponse } from '../../../lib/security';
 import { auth } from '../../../lib/auth';
+import { revalidateTag } from 'next/cache';
 
 // =======================
 // GET - Fetch revenue and investment totals (Admin only)
@@ -53,18 +54,16 @@ export async function GET(request) {
     } catch (dbError) {
       console.error('[Business Tracking] Database error:', dbError);
       return NextResponse.json({
-        totalRevenue: 0,
-        totalInvestment: 0,
-        entries: []
-      }, { status: 200 });
+        success: false,
+        error: 'Database error fetching business tracking data'
+      }, { status: 500 });
     }
   } catch (error) {
     console.error('[Business Tracking] Error fetching:', error);
     return NextResponse.json({
-      totalRevenue: 0,
-      totalInvestment: 0,
-      entries: []
-    }, { status: 200 });
+      success: false,
+      error: 'Failed to fetch business tracking data'
+    }, { status: 500 });
   }
 }
 
@@ -166,6 +165,7 @@ export async function POST(request) {
       const result = await collection.insertOne(entryData);
       console.log('[Business Tracking] Insert successful, ID:', result.insertedId);
 
+      revalidateTag('businessTracking');
       return NextResponse.json(
         {
           success: true,

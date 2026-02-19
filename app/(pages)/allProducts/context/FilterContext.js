@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 // Filter state structure
@@ -254,17 +254,27 @@ export const FilterProvider = ({ children, initialProducts = [] }) => {
   const [state, dispatch] = useReducer(filterReducer, productBasedInitialState);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const isInitFromUrl = useRef(false);
+  const isInitialized = useRef(false);
   
-  // Initialize from URL on mount
+  // Initialize from URL on mount (once only)
   useEffect(() => {
+    if (isInitialized.current) return;
+    isInitialized.current = true;
     const urlParams = parseUrlParams(searchParams);
     if (Object.keys(urlParams).length > 0) {
+      isInitFromUrl.current = true;
       dispatch({ type: FILTER_ACTIONS.INIT_FROM_URL, payload: urlParams });
     }
-  }, [searchParams]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   
-  // Update URL when filters change (debounced)
+  // Update URL when filters change (debounced), skip when state was just set from URL
   useEffect(() => {
+    if (isInitFromUrl.current) {
+      isInitFromUrl.current = false;
+      return;
+    }
+    
     const timeoutId = setTimeout(() => {
       const params = buildUrlParams(state);
       const newUrl = params.toString() ? `?${params.toString()}` : '';

@@ -1,10 +1,20 @@
 import { NextResponse } from 'next/server';
 import { getCollection } from '../../../../lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { revalidateTag } from 'next/cache';
+import { checkOrigin, isAdmin, isAuthenticated, forbiddenResponse, unauthorizedResponse } from '../../../../lib/security';
 
-// PUT - Update order status
+// PUT - Update order status (Admin only)
 export async function PUT(request, { params }) {
   try {
+    const originCheck = checkOrigin(request);
+    if (originCheck) return originCheck;
+
+    const admin = await isAdmin();
+    if (!admin) {
+      return forbiddenResponse('Only admins can update orders');
+    }
+
     // ✅ FIX: Await params in Next.js 15
     const { id } = await params;
     const orders = await getCollection('allOrders');
@@ -20,7 +30,7 @@ export async function PUT(request, { params }) {
     }
 
     // Validate status if provided
-    const validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
+    const validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'payment_verified'];
     if (status && !validStatuses.includes(status)) {
       return NextResponse.json({ 
         success: false, 
@@ -51,6 +61,8 @@ export async function PUT(request, { params }) {
     // Get the updated order
     const updatedOrder = await orders.findOne({ _id: new ObjectId(id) });
 
+    revalidateTag('orders');
+    revalidateTag('products');
     return NextResponse.json({
       success: true,
       data: updatedOrder,
@@ -66,9 +78,17 @@ export async function PUT(request, { params }) {
   }
 }
 
-// GET - Get specific order details
+// GET - Get specific order details (Authenticated users)
 export async function GET(request, { params }) {
   try {
+    const originCheck = checkOrigin(request);
+    if (originCheck) return originCheck;
+
+    const user = await isAuthenticated();
+    if (!user) {
+      return unauthorizedResponse('You must be logged in to view orders');
+    }
+
     // ✅ FIX: Await params in Next.js 15
     const { id } = await params;
     const orders = await getCollection('allOrders');
@@ -105,9 +125,17 @@ export async function GET(request, { params }) {
   }
 }
 
-// DELETE - Delete specific order
+// DELETE - Delete specific order (Admin only)
 export async function DELETE(request, { params }) {
   try {
+    const originCheck = checkOrigin(request);
+    if (originCheck) return originCheck;
+
+    const admin = await isAdmin();
+    if (!admin) {
+      return forbiddenResponse('Only admins can delete orders');
+    }
+
     // ✅ FIX: Await params in Next.js 15
     const { id } = await params;
     const orders = await getCollection('allOrders');
@@ -139,6 +167,8 @@ export async function DELETE(request, { params }) {
       }, { status: 500 });
     }
 
+    revalidateTag('orders');
+    revalidateTag('products');
     return NextResponse.json({
       success: true,
       data: { deletedId: id },

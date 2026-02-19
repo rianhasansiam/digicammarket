@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCollection } from "../../../lib/mongodb";
+import { revalidateTag } from 'next/cache';
+import { checkOrigin, isAdmin, forbiddenResponse } from '../../../lib/security';
 
 // Schema for shipping and tax settings
 const ShippingTaxSettings = {
@@ -49,6 +51,14 @@ export async function GET(request) {
 // PUT - Update shipping and tax settings (Admin only)
 export async function PUT(request) {
   try {
+    const originCheck = checkOrigin(request);
+    if (originCheck) return originCheck;
+
+    const admin = await isAdmin();
+    if (!admin) {
+      return forbiddenResponse('Only admins can update shipping and tax settings');
+    }
+
     const body = await request.json();
     const { shippingSettings, taxSettings } = body;
     
@@ -94,6 +104,7 @@ export async function PUT(request) {
       // Fetch updated settings
       const updatedSettings = await collection.findOne({ _id: "shipping_tax_settings" });
       
+      revalidateTag('shippingTaxSettings');
       return NextResponse.json({
         success: true,
         message: "Shipping and tax settings updated successfully",

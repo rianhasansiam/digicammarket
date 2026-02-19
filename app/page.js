@@ -3,7 +3,7 @@ import { Suspense } from 'react'
 import StructuredData from './componets/shared/StructuredData';
 import HomePageClient from './HomePageClient';
 import { getHomePageData } from '@/lib/data/serverDataFetchers'
-import GlobalLoadingPage from './componets/loading/GlobalLoadingPage'
+import LoadingSpinner from './componets/loading/LoadingSpinner'
 
 // 🚀 NEXT.JS 15: Enhanced SEO with dynamic data
 export async function generateMetadata() {
@@ -79,10 +79,9 @@ export default function Home() {
         }} 
       />
       <Suspense fallback={
-        <GlobalLoadingPage 
-          message="Bringing Classics to Life..." 
-          showLogo={true}
-        />
+        <div className="min-h-screen flex flex-col items-center justify-center">
+          <LoadingSpinner size="lg" color="black" />
+        </div>
       }>
         {/* 🚀 OPTIMIZED: Client component with enhanced data handling */}
         <HomePageClient />

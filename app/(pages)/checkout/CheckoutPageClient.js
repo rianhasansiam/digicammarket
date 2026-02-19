@@ -26,8 +26,8 @@ const CheckoutPageClient = () => {
   
   // Redux hooks
   const dispatch = useAppDispatch();
-  const cartItems = useAppSelector((state) => state.user.cart.items) || [];
-  const cartTotalQuantity = useAppSelector((state) => state.user.cart.totalQuantity);
+  const cartItems = useAppSelector((state) => state.user.cart.items, []);
+  const cartTotalQuantity = useAppSelector((state) => state.user.cart.totalQuantity, 0);
   
   // 🚀 OPTIMIZED: Use Redux store for centralized data caching - NO duplicate API calls
   const { data: products, isLoading, error } = useProducts();
@@ -125,26 +125,45 @@ const CheckoutPageClient = () => {
   // Reset order processed flag when cart changes
   useEffect(() => {
     setOrderProcessed(false);
-  }, [enrichedCartItems.length, selectedPayment]);
+  }, [enrichedCartItems.length]);
 
   // Calculate totals with dynamic shipping and tax
   const calculateTotals = () => {
     const subtotal = enrichedCartItems.reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 0)), 0);
     
+    // Load coupon discount from sessionStorage (persisted from cart page)
+    let couponDiscount = 0;
+    if (typeof window !== 'undefined') {
+      try {
+        const savedCoupon = sessionStorage.getItem('appliedCoupon');
+        if (savedCoupon) {
+          const coupon = JSON.parse(savedCoupon);
+          const minAmount = coupon.minAmount || coupon.minimumAmount || 0;
+          const discountValue = coupon.discount || coupon.discountPercentage || 0;
+          if (subtotal >= minAmount && discountValue > 0) {
+            couponDiscount = (subtotal * discountValue) / 100;
+          }
+        }
+      } catch (e) {
+        console.error('Error loading coupon:', e);
+      }
+    }
+    
     // Use dynamic calculation if settings are loaded, otherwise fallback
     if (!settingsLoading && calculateDynamicTotals) {
-      return calculateDynamicTotals(subtotal, 0); // No coupon discount in checkout
+      return calculateDynamicTotals(subtotal, couponDiscount);
     }
     
     // Fallback to static calculation while loading
     const shipping = subtotal >= 500 ? 0 : 15.99;
     const tax = subtotal * 0.08;
-    const total = subtotal + shipping + tax;
+    const total = subtotal + shipping + tax - couponDiscount;
 
     return {
       subtotal: subtotal.toFixed(2),
       shipping: shipping.toFixed(2),
       tax: tax.toFixed(2),
+      discount: couponDiscount.toFixed(2),
       total: total.toFixed(2),
       taxName: 'Tax'
     };
@@ -162,13 +181,16 @@ const CheckoutPageClient = () => {
 
   // Validate form
   const isFormValid = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[0-9+\-\s()]{7,20}$/;
+    
     return (
-      customerInfo.name &&
-      customerInfo.email &&
-      customerInfo.phone &&
-      customerInfo.address &&
-      customerInfo.city &&
-      customerInfo.zipCode &&
+      customerInfo.name?.trim().length >= 2 &&
+      emailRegex.test(customerInfo.email) &&
+      phoneRegex.test(customerInfo.phone) &&
+      customerInfo.address?.trim() &&
+      customerInfo.city?.trim() &&
+      customerInfo.zipCode?.trim() &&
       selectedPayment &&
       enrichedCartItems.length > 0
     );
@@ -350,9 +372,6 @@ const CheckoutPageClient = () => {
         }
       }
 
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
       // Calculate advance payment amount (15% of total)
       const advanceAmount = (parseFloat(totals.total) * 0.15).toFixed(2);
       const remainingAmount = (parseFloat(totals.total) * 0.85).toFixed(2);
@@ -410,12 +429,17 @@ const CheckoutPageClient = () => {
       // Save order to database
       const savedOrder = await addOrder(orderData);
 
+      // Verify order was saved successfully before proceeding
+      if (!savedOrder || savedOrder.error) {
+        throw new Error(savedOrder?.error || 'Failed to save order');
+      }
+
       // Check if user exists and create new user if not
       await createUserIfNotExists(customerInfo);
 
       // Create order details for display
       const order = {
-        orderId: orderData.orderId,
+        orderId: savedOrder?.order?.orderId || orderData.orderId,
         date: new Date().toLocaleDateString(),
         customer: customerInfo,
         items: enrichedCartItems,
@@ -448,11 +472,16 @@ const CheckoutPageClient = () => {
       // Clear cart from localStorage and Redux store
       dispatch(clearCart());
 
-      // Redirect to order summary page
-      // Use Base64 encoding to safely pass complex data
-      const orderDataString = JSON.stringify(order);
-      const orderDataBase64 = btoa(encodeURIComponent(orderDataString));
-      router.push(`/orderSummary?orderData=${orderDataBase64}`);
+      // Clear applied coupon from sessionStorage
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('appliedCoupon');
+      }
+
+      // Store order data in sessionStorage instead of URL to avoid PII exposure
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('lastOrderData', JSON.stringify(order));
+      }
+      router.push(`/orderSummary?orderId=${encodeURIComponent(order.orderId)}`);
 
     } catch (error) {
       console.error('Error processing order:', error);

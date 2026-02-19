@@ -3,14 +3,6 @@ import axios from 'axios';
 
 const isDev = process.env.NODE_ENV === 'development';
 
-// Cache duration constants (in milliseconds)
-const CACHE_DURATION = {
-  STATIC: 60 * 60 * 1000,      // 1 hour for static data (products, categories)
-  DYNAMIC: 10 * 60 * 1000,     // 10 minutes for dynamic data (reviews, coupons)
-  USER_SPECIFIC: 5 * 60 * 1000, // 5 minutes for user-specific data (orders)
-  NO_CACHE: 0                   // Always fetch fresh (sales, promotions)
-};
-
 // Initial state with all data entities
 const initialState = {
   // Products
@@ -18,8 +10,7 @@ const initialState = {
     data: [],
     isLoading: false,
     error: null,
-    lastFetched: null,
-    cacheType: 'STATIC'
+    lastFetched: null
   },
   
   // Categories
@@ -27,8 +18,7 @@ const initialState = {
     data: [],
     isLoading: false,
     error: null,
-    lastFetched: null,
-    cacheType: 'STATIC'
+    lastFetched: null
   },
   
   // Reviews
@@ -36,8 +26,7 @@ const initialState = {
     data: [],
     isLoading: false,
     error: null,
-    lastFetched: null,
-    cacheType: 'DYNAMIC'
+    lastFetched: null
   },
   
   // Users
@@ -45,8 +34,7 @@ const initialState = {
     data: [],
     isLoading: false,
     error: null,
-    lastFetched: null,
-    cacheType: 'DYNAMIC'
+    lastFetched: null
   },
   
   // Orders
@@ -54,8 +42,7 @@ const initialState = {
     data: [],
     isLoading: false,
     error: null,
-    lastFetched: null,
-    cacheType: 'USER_SPECIFIC'
+    lastFetched: null
   },
   
   // Coupons
@@ -63,8 +50,7 @@ const initialState = {
     data: [],
     isLoading: false,
     error: null,
-    lastFetched: null,
-    cacheType: 'DYNAMIC'
+    lastFetched: null
   },
   
   // Contacts/Messages
@@ -72,8 +58,7 @@ const initialState = {
     data: [],
     isLoading: false,
     error: null,
-    lastFetched: null,
-    cacheType: 'DYNAMIC'
+    lastFetched: null
   },
   
   // Shipping & Tax Settings
@@ -81,8 +66,7 @@ const initialState = {
     data: null,
     isLoading: false,
     error: null,
-    lastFetched: null,
-    cacheType: 'STATIC'
+    lastFetched: null
   },
 
   // Business Tracking
@@ -90,26 +74,23 @@ const initialState = {
     data: { totalRevenue: 0, totalInvestment: 0, entries: [] },
     isLoading: false,
     error: null,
-    lastFetched: null,
-    cacheType: 'DYNAMIC'
+    lastFetched: null
   },
 
-  // Sales (Flash Sales, Bundle Sales, etc.) - NO_CACHE for instant updates
+  // Sales
   sales: {
     data: [],
     isLoading: false,
     error: null,
-    lastFetched: null,
-    cacheType: 'NO_CACHE'
+    lastFetched: null
   },
 
-  // Hero Banners - STATIC cache for banner images
+  // Hero Banners
   banners: {
     data: [],
     isLoading: false,
     error: null,
-    lastFetched: null,
-    cacheType: 'STATIC'
+    lastFetched: null
   },
 
   // Global fetch status
@@ -117,12 +98,9 @@ const initialState = {
   initialDataLoaded: false
 };
 
-// Helper to check if cache is valid
-const isCacheValid = (lastFetched, cacheType) => {
-  if (!lastFetched) return false;
-  const now = Date.now();
-  const duration = CACHE_DURATION[cacheType] || CACHE_DURATION.DYNAMIC;
-  return (now - lastFetched) < duration;
+// Helper to check if cache is valid (on-demand only — data stays cached until explicitly cleared)
+const isCacheValid = (lastFetched) => {
+  return lastFetched !== null;
 };
 
 // Async Thunks for data fetching
@@ -134,8 +112,8 @@ export const fetchProducts = createAsyncThunk(
     const { data: dataState } = getState();
     const { products } = dataState;
     
-    // Skip if cache is valid
-    if (products.data.length > 0 && isCacheValid(products.lastFetched, products.cacheType)) {
+    // Skip if data exists and hasn't been invalidated
+    if (products.data.length > 0 && isCacheValid(products.lastFetched)) {
       return { data: products.data, fromCache: true };
     }
     
@@ -155,7 +133,7 @@ export const fetchCategories = createAsyncThunk(
     const { data: dataState } = getState();
     const { categories } = dataState;
     
-    if (categories.data.length > 0 && isCacheValid(categories.lastFetched, categories.cacheType)) {
+    if (categories.data.length > 0 && isCacheValid(categories.lastFetched)) {
       return { data: categories.data, fromCache: true };
     }
     
@@ -176,7 +154,7 @@ export const fetchReviews = createAsyncThunk(
     const { reviews } = dataState;
     
     // For all reviews without filters, use cache
-    if (!productId && !approved && reviews.data.length > 0 && isCacheValid(reviews.lastFetched, reviews.cacheType)) {
+    if (!productId && !approved && reviews.data.length > 0 && isCacheValid(reviews.lastFetched)) {
       return { data: reviews.data, fromCache: true };
     }
     
@@ -202,7 +180,7 @@ export const fetchUsers = createAsyncThunk(
     const { data: dataState } = getState();
     const { users } = dataState;
     
-    if (users.data.length > 0 && isCacheValid(users.lastFetched, users.cacheType)) {
+    if (users.data.length > 0 && isCacheValid(users.lastFetched)) {
       return { data: users.data, fromCache: true };
     }
     
@@ -222,7 +200,7 @@ export const fetchOrders = createAsyncThunk(
     const { data: dataState } = getState();
     const { orders } = dataState;
     
-    if (orders.data.length > 0 && isCacheValid(orders.lastFetched, orders.cacheType)) {
+    if (orders.data.length > 0 && isCacheValid(orders.lastFetched)) {
       return { data: orders.data, fromCache: true };
     }
     
@@ -242,7 +220,7 @@ export const fetchCoupons = createAsyncThunk(
     const { data: dataState } = getState();
     const { coupons } = dataState;
     
-    if (coupons.data.length > 0 && isCacheValid(coupons.lastFetched, coupons.cacheType)) {
+    if (coupons.data.length > 0 && isCacheValid(coupons.lastFetched)) {
       return { data: coupons.data, fromCache: true };
     }
     
@@ -262,7 +240,7 @@ export const fetchContacts = createAsyncThunk(
     const { data: dataState } = getState();
     const { contacts } = dataState;
     
-    if (contacts.data.length > 0 && isCacheValid(contacts.lastFetched, contacts.cacheType)) {
+    if (contacts.data.length > 0 && isCacheValid(contacts.lastFetched)) {
       return { data: contacts.data, fromCache: true };
     }
     
@@ -282,7 +260,7 @@ export const fetchShippingTaxSettings = createAsyncThunk(
     const { data: dataState } = getState();
     const { shippingTaxSettings } = dataState;
     
-    if (shippingTaxSettings.data && isCacheValid(shippingTaxSettings.lastFetched, shippingTaxSettings.cacheType)) {
+    if (shippingTaxSettings.data && isCacheValid(shippingTaxSettings.lastFetched)) {
       return { data: shippingTaxSettings.data, fromCache: true };
     }
     
@@ -302,7 +280,7 @@ export const fetchBusinessTracking = createAsyncThunk(
     const { data: dataState } = getState();
     const { businessTracking } = dataState;
     
-    if (businessTracking.data && isCacheValid(businessTracking.lastFetched, businessTracking.cacheType)) {
+    if (businessTracking.data && isCacheValid(businessTracking.lastFetched)) {
       return { data: businessTracking.data, fromCache: true };
     }
     
@@ -315,10 +293,18 @@ export const fetchBusinessTracking = createAsyncThunk(
   }
 );
 
-// Fetch Sales - NO CACHE, always fetch fresh
+// Fetch Sales
 export const fetchSales = createAsyncThunk(
   'data/fetchSales',
-  async ({ activeOnly = false } = {}, { rejectWithValue }) => {
+  async ({ activeOnly = false } = {}, { getState, rejectWithValue }) => {
+    const { data: dataState } = getState();
+    const { sales } = dataState;
+    
+    // Skip if data exists and hasn't been invalidated (non-filtered requests)
+    if (!activeOnly && sales.data.length > 0 && isCacheValid(sales.lastFetched)) {
+      return { data: sales.data, fromCache: true };
+    }
+    
     try {
       const url = activeOnly ? '/api/sales?active=true' : '/api/sales';
       const response = await axios.get(url);
@@ -337,7 +323,7 @@ export const fetchBanners = createAsyncThunk(
     const { banners } = dataState;
     
     // For all banners without activeOnly filter, use cache
-    if (!activeOnly && banners.data.length > 0 && isCacheValid(banners.lastFetched, banners.cacheType)) {
+    if (!activeOnly && banners.data.length > 0 && isCacheValid(banners.lastFetched)) {
       return { data: banners.data, fromCache: true };
     }
     
@@ -359,16 +345,16 @@ export const fetchInitialData = createAsyncThunk(
     
     const promises = [];
     
-    // Only fetch if not cached
-    if (!dataState.products.data.length || !isCacheValid(dataState.products.lastFetched, dataState.products.cacheType)) {
+    // Only fetch if not cached (cache is invalidated on-demand)
+    if (!dataState.products.data.length || !isCacheValid(dataState.products.lastFetched)) {
       promises.push(dispatch(fetchProducts()));
     }
     
-    if (!dataState.categories.data.length || !isCacheValid(dataState.categories.lastFetched, dataState.categories.cacheType)) {
+    if (!dataState.categories.data.length || !isCacheValid(dataState.categories.lastFetched)) {
       promises.push(dispatch(fetchCategories()));
     }
     
-    if (!dataState.reviews.data.length || !isCacheValid(dataState.reviews.lastFetched, dataState.reviews.cacheType)) {
+    if (!dataState.reviews.data.length || !isCacheValid(dataState.reviews.lastFetched)) {
       promises.push(dispatch(fetchReviews()));
     }
     

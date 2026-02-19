@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { ObjectId } from 'mongodb';
 import { getCollection } from '../../../../lib/mongodb';
 import { checkOrigin, isAdmin, forbiddenResponse } from '../../../../lib/security';
+import { revalidateTag } from 'next/cache';
 
 // GET - Get single sale by ID
 export async function GET(request, { params }) {
@@ -88,6 +89,7 @@ export async function PUT(request, { params }) {
       }, { status: 404 });
     }
 
+    revalidateTag('sales');
     return NextResponse.json({
       success: true,
       data: result,
@@ -133,6 +135,7 @@ export async function DELETE(request, { params }) {
       }, { status: 404 });
     }
 
+    revalidateTag('sales');
     return NextResponse.json({
       success: true,
       message: "Sale deleted successfully"

@@ -223,7 +223,7 @@ export default function WishListPageClient() {
 
   // Redux hooks
   const dispatch = useAppDispatch();
-  const wishlistItems = useAppSelector((state) => state.user.wishlist.items);
+  const wishlistItems = useAppSelector((state) => state.user.wishlist.items, []);
   
   const [items, setItems] = useState([]);
   const [viewMode, setViewMode] = useState('grid');
@@ -374,10 +374,10 @@ export default function WishListPageClient() {
   // Loading state
   if (productsLoading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <LoadingSpinner size="lg" />
-          {/* <p className="text-gray-600 mt-4">Loading your wishlist...</p> */}
+          <p className="text-gray-500 mt-4">Loading your wishlist...</p>
         </div>
       </div>
     );

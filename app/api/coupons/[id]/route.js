@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getCollection } from '../../../../lib/mongodb';
+import { revalidateTag } from 'next/cache';
 
 // PUT - Update coupon by ID
 export async function PUT(request, { params }) {
@@ -29,6 +30,7 @@ export async function PUT(request, { params }) {
       }, { status: 404 });
     }
 
+    revalidateTag('coupons');
     return NextResponse.json({
       success: true,
       Data: result,
@@ -70,6 +72,7 @@ export async function DELETE(request, { params }) {
       }, { status: 404 });
     }
 
+    revalidateTag('coupons');
     return NextResponse.json({
       success: true,
       Data: result,

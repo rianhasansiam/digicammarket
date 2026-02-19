@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCollection } from '../../../lib/mongodb';
 import { checkOrigin, isAdmin, forbiddenResponse } from '../../../lib/security';
+import { revalidateTag } from 'next/cache';
 
 // GET - Get all coupons (Admin only)
 export async function GET(request) {
@@ -61,6 +62,7 @@ export async function POST(request) {
     // Insert the new coupon
     const result = await coupons.insertOne(couponData);
 
+    revalidateTag('coupons');
     return NextResponse.json({
       success: true,
       Data: result,

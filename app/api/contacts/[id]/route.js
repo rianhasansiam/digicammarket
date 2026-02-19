@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCollection } from '../../../../lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { revalidateTag } from 'next/cache';
 
 // DELETE - Delete specific contact by ID
 export async function DELETE(request, { params }) {
@@ -29,6 +30,7 @@ export async function DELETE(request, { params }) {
       }, { status: 404 });
     }
 
+    revalidateTag('contacts');
     return NextResponse.json({
       success: true,
       message: "Contact deleted successfully"
@@ -90,6 +92,7 @@ export async function PATCH(request, { params }) {
       }, { status: 404 });
     }
 
+    revalidateTag('contacts');
     return NextResponse.json({
       success: true,
       message: `Contact marked as ${status}`

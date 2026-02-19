@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { ObjectId } from 'mongodb';
 import { getCollection } from '../../../../lib/mongodb';
+import { revalidateTag } from 'next/cache';
 
 // DELETE - Delete user by ID
 export async function DELETE(request, { params }) {
@@ -43,6 +44,9 @@ export async function DELETE(request, { params }) {
         { status: 500 }
       );
     }
+
+    // On-demand revalidation
+    revalidateTag('users');
 
     return NextResponse.json({
       success: true,
@@ -120,6 +124,9 @@ export async function PATCH(request, { params }) {
     // Get updated user data
     const updatedUser = await users.findOne({ _id: new ObjectId(id) });
     const { password, ...userWithoutPassword } = updatedUser;
+
+    // On-demand revalidation
+    revalidateTag('users');
 
     return NextResponse.json({
       success: true,

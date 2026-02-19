@@ -1,9 +1,19 @@
 import { NextResponse } from 'next/server';
 import { getCollection } from '../../../../lib/mongodb';
+import { revalidateTag } from 'next/cache';
+import { checkOrigin, isAdmin, forbiddenResponse } from '../../../../lib/security';
 
-// PUT - Update category by ID
+// PUT - Update category by ID (Admin only)
 export async function PUT(request, { params }) {
   try {
+    const originCheck = checkOrigin(request);
+    if (originCheck) return originCheck;
+
+    const admin = await isAdmin();
+    if (!admin) {
+      return forbiddenResponse('Only admins can update categories');
+    }
+
     // ✅ FIX: Await params in Next.js 15
     const { id } = await params;
     const categories = await getCollection('allCategories');
@@ -17,9 +27,10 @@ export async function PUT(request, { params }) {
     }
 
     const { ObjectId } = (await import('mongodb'));
+    const { _id: bodyId, ...updateData } = body;
     const result = await categories.updateOne(
       { _id: new ObjectId(id) }, 
-      { $set: { ...body, updatedAt: new Date() } }
+      { $set: { ...updateData, updatedAt: new Date() } }
     );
 
     if (result.matchedCount === 0) {
@@ -28,6 +39,10 @@ export async function PUT(request, { params }) {
         error: 'Category not found' 
       }, { status: 404 });
     }
+
+    // On-demand revalidation
+    revalidateTag('categories');
+    revalidateTag('products');
 
     return NextResponse.json({ 
       success: true, 
@@ -44,9 +59,17 @@ export async function PUT(request, { params }) {
   }
 }
 
-// DELETE - Delete category by ID
+// DELETE - Delete category by ID (Admin only)
 export async function DELETE(request, { params }) {
   try {
+    const originCheck = checkOrigin(request);
+    if (originCheck) return originCheck;
+
+    const admin = await isAdmin();
+    if (!admin) {
+      return forbiddenResponse('Only admins can delete categories');
+    }
+
     // ✅ FIX: Await params in Next.js 15
     const { id } = await params;
     const categories = await getCollection('allCategories');
@@ -67,6 +90,10 @@ export async function DELETE(request, { params }) {
         error: 'Category not found' 
       }, { status: 404 });
     }
+
+    // On-demand revalidation
+    revalidateTag('categories');
+    revalidateTag('products');
 
     return NextResponse.json({ 
       success: true, 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
@@ -54,6 +54,19 @@ const HeroClient = ({
   
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const resumeTimeoutRef = useRef(null);
+  
+  // Helper to pause auto-play and resume after delay
+  const pauseAutoPlay = useCallback(() => {
+    setIsAutoPlaying(false);
+    clearTimeout(resumeTimeoutRef.current);
+    resumeTimeoutRef.current = setTimeout(() => setIsAutoPlaying(true), 10000);
+  }, []);
+  
+  // Cleanup resume timeout on unmount
+  useEffect(() => {
+    return () => clearTimeout(resumeTimeoutRef.current);
+  }, []);
   
   // Separate main carousel banners from side banners
   const allActiveBanners = Array.isArray(bannersData) 
@@ -81,22 +94,18 @@ const HeroClient = ({
   
   const goToSlide = useCallback((index) => {
     setCurrentSlide(index);
-    setIsAutoPlaying(false);
-    // Resume auto-play after 10 seconds
-    setTimeout(() => setIsAutoPlaying(true), 10000);
-  }, []);
+    pauseAutoPlay();
+  }, [pauseAutoPlay]);
   
   const goToPrevSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev - 1 + mainBanners.length) % mainBanners.length);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000);
-  }, [mainBanners.length]);
+    pauseAutoPlay();
+  }, [mainBanners.length, pauseAutoPlay]);
   
   const goToNextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % mainBanners.length);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000);
-  }, [mainBanners.length]);
+    pauseAutoPlay();
+  }, [mainBanners.length, pauseAutoPlay]);
   
   // If no banners, show default hero
   if (!hasBanners) {

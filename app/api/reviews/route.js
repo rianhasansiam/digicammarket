@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getCollection } from '../../../lib/mongodb';
 import { checkOrigin, isAdmin, isAuthenticated, forbiddenResponse, unauthorizedResponse } from '../../../lib/security';
 import apiCache from '../../../lib/cache/apiCache';
+import { revalidateTag } from 'next/cache';
 
 // 🚀 PERFORMANCE: Create indexes for faster queries
 async function ensureIndexes(collection) {
@@ -11,9 +12,9 @@ async function ensureIndexes(collection) {
     await collection.createIndex({ rating: -1 }); // For sorting by rating
     await collection.createIndex({ createdAt: -1 }); // For sorting by date
     await collection.createIndex({ productId: 1, isApproved: 1 }); // Compound index for common queries
-    console.log('Reviews indexes created successfully');
+    // Indexes created successfully
   } catch (error) {
-    console.log('Reviews indexes might already exist:', error.message);
+    // Indexes might already exist
   }
 }
 
@@ -29,15 +30,12 @@ export async function GET(request) {
     const productId = searchParams.get('productId');
     const isApprovedOnly = searchParams.get('approved') === 'true';
 
-    console.log(`Fetching reviews - productId: ${productId}, approvedOnly: ${isApprovedOnly}`);
-
     // 🚀 PERFORMANCE: Build cache key based on query parameters
     const cacheKey = `reviews:${productId || 'all'}:${isApprovedOnly ? 'approved' : 'all'}`;
     
-    // 🚀 PERFORMANCE: Check server-side cache (5 minutes for reviews - DYNAMIC data)
-    const cached = apiCache.get(cacheKey, 5 * 60 * 1000);
+    // Check server-side cache (on-demand invalidation only)
+    const cached = apiCache.get(cacheKey);
     if (cached) {
-      console.log(`Cache HIT for reviews: ${cacheKey} - Returning ${cached.length} reviews`);
       return NextResponse.json(cached, {
         headers: { 'X-Cache': 'HIT' }
       });
@@ -47,7 +45,6 @@ export async function GET(request) {
     let reviews;
     try {
       reviews = await getCollection('allReviews');
-      console.log('Successfully accessed allReviews collection');
     } catch (collectionError) {
       console.error('Error accessing reviews collection:', collectionError);
       console.error('Collection error details:', collectionError.message);
@@ -76,29 +73,16 @@ export async function GET(request) {
       query.isApproved = true;
     }
     
-    console.log('Query being executed:', JSON.stringify(query));
-    
     // Find reviews with query and sort by date (newest first)
     const allReviews = await reviews.find(query).sort({ createdAt: -1 }).toArray();
 
-    console.log(`Found ${allReviews.length} reviews from database`);
-    if (allReviews.length > 0) {
-      console.log('Sample review:', {
-        _id: allReviews[0]._id,
-        productId: allReviews[0].productId,
-        rating: allReviews[0].rating,
-        isApproved: allReviews[0].isApproved
-      });
-    }
-
     // 🚀 PERFORMANCE: Cache the results
     apiCache.set(cacheKey, allReviews);
-    console.log(`Cache MISS for reviews: ${cacheKey} - Cached ${allReviews.length} reviews`);
 
     return NextResponse.json(allReviews, {
       headers: { 
         'X-Cache': 'MISS',
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
+        'Cache-Control': 'private, no-cache, must-revalidate'
       }
     });
 
@@ -211,22 +195,13 @@ export async function POST(request) {
       updatedAt: new Date().toISOString()
     };
     
-    console.log('Creating review with data:', { 
-      userId: reviewData.userId, 
-      userName: reviewData.userName,
-      rating: reviewData.rating,
-      productId: reviewData.productId 
-    });
-    
     // Insert the new review
     const result = await reviews.insertOne(reviewData);
-    
-    console.log('Review created successfully:', result.insertedId);
 
-    // 🚀 PERFORMANCE: Invalidate all review caches when new review is added
+    // Invalidate all review caches on-demand
     try {
       apiCache.invalidateByPattern('reviews:');
-      console.log('Review caches invalidated after POST');
+      revalidateTag('reviews');
     } catch (cacheError) {
       console.warn('Could not invalidate cache:', cacheError.message);
     }
@@ -291,9 +266,9 @@ export async function PUT(request) {
       return NextResponse.json({ success: false, error: 'Review not found' }, { status: 404 });
     }
     
-    // 🚀 PERFORMANCE: Invalidate all review caches when review is updated
+    // Invalidate all review caches on-demand
     apiCache.invalidateByPattern('reviews:');
-    console.log('Review caches invalidated after PUT');
+    revalidateTag('reviews');
     
     return NextResponse.json({ success: true, Data: result, message: 'Review updated successfully' });
   } catch (error) {
@@ -338,9 +313,9 @@ export async function DELETE(request) {
       return NextResponse.json({ success: false, error: 'Review not found' }, { status: 404 });
     }
     
-    // 🚀 PERFORMANCE: Invalidate all review caches when review is deleted
+    // Invalidate all review caches on-demand
     apiCache.invalidateByPattern('reviews:');
-    console.log('Review caches invalidated after DELETE');
+    revalidateTag('reviews');
     
     return NextResponse.json({ success: true, Data: result, message: 'Review deleted successfully' });
   } catch (error) {

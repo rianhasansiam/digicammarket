@@ -1,10 +1,20 @@
 import { NextResponse } from 'next/server';
 import { getCollection } from '../../../lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { revalidateTag } from 'next/cache';
+import { checkOrigin, isAdmin, forbiddenResponse } from '../../../lib/security';
 
-// GET - Get all contacts
+// GET - Get all contacts (Admin only)
 export async function GET(request) {
   try {
+    const originCheck = checkOrigin(request);
+    if (originCheck) return originCheck;
+
+    const admin = await isAdmin();
+    if (!admin) {
+      return forbiddenResponse('Only admins can view contact messages');
+    }
+
     // Get the contacts collection
     const contacts = await getCollection('allContacts');
     
@@ -34,16 +44,29 @@ export async function POST(request) {
     // Get the request body
     const body = await request.json();
     
+    // Validate required fields
+    if (!body.name || !body.email || !body.message) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Name, email, and message are required' 
+      }, { status: 400 });
+    }
+    
     // Add metadata
     const contactData = {
-      ...body,
+      name: String(body.name).trim().substring(0, 200),
+      email: String(body.email).trim().toLowerCase().substring(0, 200),
+      phone: body.phone ? String(body.phone).trim().substring(0, 20) : undefined,
+      subject: body.subject ? String(body.subject).trim().substring(0, 300) : undefined,
+      message: String(body.message).trim().substring(0, 5000),
       createdAt: new Date(),
-      status: 'unread' // Add status for admin management
+      status: 'unread'
     };
     
     // Insert the new contact
     const result = await contacts.insertOne(contactData);
 
+    revalidateTag('contacts');
     return NextResponse.json({
       success: true,
       Data: { ...contactData, _id: result.insertedId },

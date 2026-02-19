@@ -7,7 +7,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useLoadingState } from '@/lib/hooks/useLoadingHooks';
 import LoadingSpinner from '../../componets/loading/LoadingSpinner';
 
 const LoginPageClient = ({ loginData }) => {
@@ -21,7 +20,6 @@ const LoginPageClient = ({ loginData }) => {
   const [loginStatus, setLoginStatus] = useState(null);
   const [errors, setErrors] = useState({});
   const router = useRouter();
-  const { showLoading, hideLoading } = useLoadingState();
 
   // Check if user is already authenticated
   const { data: session, status } = useSession();
@@ -103,7 +101,6 @@ const LoginPageClient = ({ loginData }) => {
     
     setIsLoading(true);
     setLoginStatus(null);
-    showLoading('Signing you in...', 'minimal');
 
     try {
       const result = await signIn('credentials', {
@@ -130,14 +127,12 @@ const LoginPageClient = ({ loginData }) => {
       setErrors(prev => ({ ...prev, api: 'Network error. Please try again.' }));
     } finally {
       setIsLoading(false);
-      hideLoading();
     }
   };
 
   // Handle Google login with NextAuth
   const handleGoogleLogin = async () => {
     setIsLoading(true);
-    showLoading('Connecting to Google...', 'minimal');
     
     try {
       const result = await signIn('google', {
@@ -149,7 +144,6 @@ const LoginPageClient = ({ loginData }) => {
         setLoginStatus('error');
         setErrors(prev => ({ ...prev, api: 'Google sign-in failed. Please try again.' }));
         setIsLoading(false);
-        hideLoading();
       } else if (result?.url) {
         setLoginStatus('success');
         window.location.href = result.url;
@@ -159,7 +153,6 @@ const LoginPageClient = ({ loginData }) => {
       setLoginStatus('error');
       setErrors(prev => ({ ...prev, api: 'Google sign-in failed. Please try again.' }));
       setIsLoading(false);
-      hideLoading();
     }
   };
 

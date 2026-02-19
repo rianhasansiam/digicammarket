@@ -15,8 +15,8 @@ const NavbarClient = ({ navItems, defaultShopCategories }) => {
   const { data: session, status } = useSession();
   
   // Get cart and wishlist counts from Redux store
-  const cartTotalQuantity = useAppSelector((state) => state.user.cart.totalQuantity);
-  const wishlistTotalItems = useAppSelector((state) => state.user.wishlist.totalItems);
+  const cartTotalQuantity = useAppSelector((state) => state.user.cart.totalQuantity, 0);
+  const wishlistTotalItems = useAppSelector((state) => state.user.wishlist.totalItems, 0);
   
   // 🚀 OPTIMIZED: Use Redux store for centralized data caching - NO duplicate API calls
   const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
@@ -143,7 +143,12 @@ const NavbarClient = ({ navItems, defaultShopCategories }) => {
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      // Clean up dropdown timeouts on unmount
+      clearTimeout(shopDropdownTimeoutRef.current);
+      clearTimeout(userDropdownTimeoutRef.current);
+    };
   }, []);
 
   useEffect(() => {

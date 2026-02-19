@@ -4,29 +4,27 @@ import { useCallback } from 'react'
 // Enhanced hooks for Redux with error handling
 export const useAppDispatch = () => useDispatch()
 
+// Safe defaults map for common selector paths
+const SAFE_DEFAULTS = {
+  cartItems: [],
+  cartQuantity: 0,
+  cartAmount: 0,
+  wishlistItems: [],
+  wishlistTotal: 0
+}
+
 // Enhanced selector with error handling to prevent proxy revocation errors
-export const useAppSelector = (selector) => {
+export const useAppSelector = (selector, defaultValue = null) => {
   return useSelector(useCallback((state) => {
     try {
       if (!state || !state.user) {
-        // Return safe defaults if state is not available
-        if (selector.toString().includes('cart.items')) return []
-        if (selector.toString().includes('cart.totalQuantity')) return 0
-        if (selector.toString().includes('cart.totalAmount')) return 0
-        if (selector.toString().includes('wishlist.items')) return []
-        if (selector.toString().includes('wishlist.totalItems')) return 0
-        return null
+        return defaultValue
       }
-      return selector(state)
+      const result = selector(state)
+      return result ?? defaultValue
     } catch (error) {
       console.error('Error in useAppSelector:', error)
-      // Return safe defaults based on common selectors
-      if (selector.toString().includes('cart.items')) return []
-      if (selector.toString().includes('cart.totalQuantity')) return 0
-      if (selector.toString().includes('cart.totalAmount')) return 0
-      if (selector.toString().includes('wishlist.items')) return []
-      if (selector.toString().includes('wishlist.totalItems')) return 0
-      return null
+      return defaultValue
     }
-  }, [selector]))
+  }, [selector, defaultValue]))
 }
