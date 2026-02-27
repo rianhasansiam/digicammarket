@@ -10,6 +10,7 @@ import ReactQueryProvider from "@/lib/ReactQueryProvider";
 import SkipNavigation from "./componets/shared/SkipNavigation";
 import DataInitializer from "./componets/shared/DataInitializer";
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -79,6 +80,7 @@ export default function RootLayout({ children }) {
             </ReactQueryProvider>
           </StoreProvider>
         </AuthProvider>
+        <SpeedInsights/>
         <Analytics/>
       </body>
     </html>
