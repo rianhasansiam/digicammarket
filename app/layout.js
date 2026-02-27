@@ -9,7 +9,7 @@ import AuthProvider from "../lib/AuthProvider";
 import ReactQueryProvider from "@/lib/ReactQueryProvider";
 import SkipNavigation from "./componets/shared/SkipNavigation";
 import DataInitializer from "./componets/shared/DataInitializer";
-
+import { Analytics } from "@vercel/analytics/next"
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -79,6 +79,7 @@ export default function RootLayout({ children }) {
             </ReactQueryProvider>
           </StoreProvider>
         </AuthProvider>
+        <Analytics/>
       </body>
     </html>
   );
